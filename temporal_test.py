@@ -44,8 +44,16 @@ HERE = Path(__file__).resolve().parent
 SETS = ["avg", "avg+shape", "avg+stereo", "avg+time", "all"]
 
 
+SKIP = set()  # feature keys not to load, to save memory (e.g. tests that only use the fakeprints)
+
+
+def npz(path):
+    z = np.load(path)
+    return {k: z[k] for k in z.files if k not in SKIP}
+
+
 def read(paths):
-    parts = [dict(np.load(p)) for p in paths]
+    parts = [npz(p) for p in paths]
     return {k: np.concatenate([p[k] for p in parts]) for k in parts[0] if all(k in p for p in parts)}
 
 
@@ -71,11 +79,11 @@ def load(tm, quick, hold=("etree",)):
     new["origin"] = np.full(len(new["names"]), "ai", dtype=object)
     rows.append(new)
     for p in sorted((tm / "more_real").glob("*.npz")):
-        d = dict(np.load(p))
+        d = npz(p)
         ok = d["src_sr"] >= 44100
         rows.append({k: v[ok] for k, v in d.items() if getattr(v, "ndim", 0) and len(v) == len(ok)})
-    keys = ["fp0", "fp1", "tstd0", "tstd1", "tco0", "tco1", "shape0", "shape1", "stereo", "sharp0", "sharp1",
-            "sources", "groups", "origin"]
+    keys = [k for k in ["fp0", "fp1", "tstd0", "tstd1", "tco0", "tco1", "shape0", "shape1", "stereo", "sharp0",
+                        "sharp1", "sources", "groups", "origin"] if k not in SKIP]
     d = {k: np.concatenate([r[k] for r in rows]) for k in keys}
     d["sources"], d["origin"] = d["sources"].astype(str), d["origin"].astype(str)
     held = {}
@@ -87,7 +95,7 @@ def load(tm, quick, hold=("etree",)):
         keep = np.sort(np.random.default_rng(0).choice(len(d["sources"]), quick, replace=False))
         d = {k: v[keep] for k, v in d.items()}
     d["fam"] = np.array([FAMILY.get(s, s) for s in d["sources"]])
-    f = dict(np.load(tm / "fresh44.npz"))
+    f = npz(tm / "fresh44.npz")
     hi = f["src_sr"] >= 44100
     f = {k: v[hi] for k, v in f.items() if getattr(v, "ndim", 0) and len(v) == len(hi)}
     real = d["sources"] == "real"

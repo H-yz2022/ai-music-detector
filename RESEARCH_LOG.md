@@ -1050,7 +1050,49 @@ songs. Model: `model_twoband.joblib` (classifier; in brackets with the comb):
   alarms matter more than a few more AI songs caught, when the answer is about real people's music). The whole song
   stays as an option: `detect.py predict song.mp3 --whole`, or `demo.show(path, mode="whole")`.
 
-## Status and next steps (Nov 23, 2026)
+## Generators it never saw: stretching, and would more songs help? (stretch_test.py, learning_test.py)
+
+The weak spot is generators the model never trained on (about two thirds caught). Two questions, no download:
+
+**1. Stretch the fakeprints while training (`stretch_test.py`).** Half of the training songs get both fakeprints
+stretched along the frequency axis by a random factor (up to ±3% or ±10%), like a small speed change. The hope:
+the model learns "evenly spaced peaks" instead of "peaks at these exact frequencies". Quick run on 3,000 songs
+(the full run was not needed):
+
+| LR per family | No stretch | ±3% | ±10% |
+|---|---|---|---|
+| AI caught, 5-fold cv | 88.3% | 78.6% | 72.7% |
+| AI caught, family never seen | **69.6%** | 59.7% | 54.5% |
+| MiniMax / Suno V5.5 (fresh44) | 88 / 99% | 51 / 95% | 32 / 87% |
+| Speed −1% / +1% (robustness songs, AI caught) | 18 / 15% | 23 / 14% | 14 / 25% |
+
+LR one boundary showed the same: 50.8% → 36.9% → 27.9% of never-seen families. **Stretching makes everything
+worse and does not fix speed changes.** A linear model on the fakeprint cannot learn "a comb anywhere": it can only
+spread its weights thinner. Position-free patterns need a different feature (the precise comb does this; the
+autocorrelation was a near miss).
+
+**2. Learning curve (`learning_test.py`, LR one boundary).** Is a generator weak because there are too few of its
+songs, or because its trace is faint? Each weak family is split into 3 folds by group; the model trains on 0, 1/3,
+2/3 or all of the other two folds (cut-off: 95% of real songs held out by artist):
+
+| Family | 0 songs | 1/3 | 2/3 | all (songs) | Last step |
+|---|---|---|---|---|---|
+| Udio (control) | 8.0% | 82.6% | 88.1% | 89.9% (867) | +1.8: levelled off |
+| Sonauto | 32.4% | 49.1% | 63.2% | 67.3% (333) | +4.2: still rising |
+| Mureka | 20.5% | 29.2% | 33.5% | 37.5% (441) | +3.9: still rising |
+| Lyria | 22.0% | 25.0% | 30.0% | 33.0% (67) | +3.0: still rising |
+| Mubert | 6.0% | 9.4% | 12.1% | 15.4% (99) | +3.4: still rising |
+
+**What this means:**
+- **Seeing a generator's songs is what works.** Udio goes from 8% (never seen) to 83% with about 400 of its songs.
+  So the practical answer to new generators is to keep adding their songs and retrain.
+- **Mureka, Lyria and Mubert have a faint trace:** even with all their songs they stay under 40%, rising only
+  3–4 points per step. More songs would help a little, but not enough.
+- **Hardly any more songs exist:** all 662 Mureka songs (MUSIC8K) and all 100 Lyria Pro 3 songs (HAIM) are already
+  used; Lyria 3 has 51 (sleeping-ai/Lyria3); no Mubert dataset was found. Only Sonauto has many more
+  (ai-music-deduplicated: 26 GB, 500 songs used so far).
+
+## Status and next steps (Nov 24, 2026)
 
 - Bump removal (`remove_bumps()`, `comb_score(..., bump_hz=15)`) and the precise comb (`precise_comb()`) are in
   `fakeprint.py`. `detect.py predict` uses them and prints the exact spacing. The `selftest` and `train` reports and
@@ -1085,6 +1127,8 @@ songs. Model: `model_twoband.joblib` (classifier; in brackets with the comb):
      checked on 1,200 new songs (`wholecheck_test.py`): 99.7% of AI caught vs 95.8% for windows, but 7.0% of real
      songs flagged vs 3.3%. So windows stay the default and the whole song is an option (`--whole`).
      Next: calibrate the whole song on more varied complete real songs, then check it again on new songs.
+  9. Done: stretch augmentation (`stretch_test.py`): worse everywhere, not used. Learning curve
+     (`learning_test.py`): new generators need their own songs; Mureka, Lyria and Mubert stay weak even then.
   6. fresh44 and the live concerts have now also been used to judge the new features, so a model chosen from
      these results needs a new, unused test set.
 
@@ -1262,6 +1306,8 @@ the model can learn "MP3 vs WAV" instead of "AI vs real".
 | `demo.py`, `demo.ipynb` | Colab demo: score one song, plot its rank among real songs and its fakeprint; `python -I demo.py` exports the models as plain numbers (`demo_models\`) and builds `dist\ai-music-detector-demo.zip` |
 | `calibrate_whole.py` | Whole-song cut-off and real-song ranks for `predict`, from 1,130 complete real songs → `model_twoband.joblib["whole"]` |
 | `wholecheck_test.py` | Checks whole-song `predict` on a new test set (new real songs, unused Suno V5.5 / MiniMax songs; `--build` streams them) → `reports\wholecheck_test.json` |
+| `stretch_test.py` | Frequency-stretch augmentation of the training fakeprints (±3%, ±10%) vs none → `reports\stretch_test.json` (full run) |
+| `learning_test.py` | Learning curve for the weak generators: share caught vs how many of their songs are trained on → `reports\learning_test.json` |
 | `robust_test.py` | Robustness: 220 songs changed 11 ways (speed, pitch, tempo, MP3/Ogg re-encode, EQ, noise), scored by every model → `reports\robust_test.json` (`--rescore` re-scores saved fakeprints) |
 | `more_real.py` | 1,500 more varied real songs (FMA large, Internet Archive netlabels and Live Music Archive), fakeprints only → `features_hq\more_real\` |
 | `more44_test.py` | 2,762 more AI songs (Udio, Mureka, HeartMuLa, Sonauto, Lyria Pro 3) read from tar, parquet and single files; before/after tests (`--family`: per-family classifier) |
