@@ -2,6 +2,10 @@
 
 The full lab notebook: every test, in the order it was run. For a short overview, see [README.md](README.md).
 
+*Clean-up (Nov 24, 2026):* replaced models (`model.joblib`, `model_final`, `model_twoband_v1_old`, `model_twoband_v2`,
+`model_twoband_family`), the first audio samples (`data\`, `data_fresh\`), the HTML reports and the demo zip were
+deleted. The commands below that made them still work; `predict` uses `model_twoband.joblib` and `model_family.joblib`.
+
 Detects AI-generated music (Suno, Udio and similar) from the audio alone. It
 re-implements the method from **"A Fourier Explanation of AI-music Artifacts"**
 (Afchar, Meseguer-Brocal, Akesbi, Hennequin · ISMIR 2025 ·
