@@ -1,0 +1,169 @@
+{
+ "read_mb": 252.438098,
+ "bands": [
+  "0.5-2 kHz",
+  "2-5 kHz",
+  "5-16 kHz",
+  "16-20 kHz"
+ ],
+ "sources": {
+  "real": {
+   "songs": 50,
+   "sample_rates": [
+    44100
+   ],
+   "top_khz_median": 18.363784790039062,
+   "bands": {
+    "0.5-2 kHz": {
+     "beat_real_95": 0.06,
+     "median_comb": 5.323957339055662,
+     "mean_fp_comb": 4.463103617048287,
+     "mean_fp_spacing_hz": 294.0803220961243,
+     "songs": 50
+    },
+    "2-5 kHz": {
+     "beat_real_95": 0.06,
+     "median_comb": 5.116702645638969,
+     "mean_fp_comb": 4.309015975063111,
+     "mean_fp_spacing_hz": 1247.5542727857828,
+     "songs": 50
+    },
+    "5-16 kHz": {
+     "beat_real_95": 0.06,
+     "median_comb": 4.780455352381649,
+     "mean_fp_comb": 4.276850276520016,
+     "mean_fp_spacing_hz": 1322.7391675114632,
+     "songs": 50
+    },
+    "16-20 kHz": {
+     "beat_real_95": 0.06,
+     "median_comb": 4.70934309722334,
+     "mean_fp_comb": 4.464721506541058,
+     "mean_fp_spacing_hz": 502.97639038413763,
+     "songs": 50
+    }
+   }
+  },
+  "suno": {
+   "songs": 20,
+   "sample_rates": [
+    48000
+   ],
+   "top_khz_median": 17.3291015625,
+   "bands": {
+    "0.5-2 kHz": {
+     "beat_real_95": 0.1,
+     "median_comb": 5.6091796434163435,
+     "mean_fp_comb": 4.9983533854867375,
+     "mean_fp_spacing_hz": 524.3749916553497,
+     "songs": 20
+    },
+    "2-5 kHz": {
+     "beat_real_95": 0.9,
+     "median_comb": 11.3322839912395,
+     "mean_fp_comb": 15.55522482679111,
+     "mean_fp_spacing_hz": 199.98342990875244,
+     "songs": 20
+    },
+    "5-16 kHz": {
+     "beat_real_95": 0.9,
+     "median_comb": 15.34632918285735,
+     "mean_fp_comb": 17.296686244823462,
+     "mean_fp_spacing_hz": 200.00168681144714,
+     "songs": 20
+    },
+    "16-20 kHz": {
+     "beat_real_95": 0.25,
+     "median_comb": 6.377135870159432,
+     "mean_fp_comb": 12.11443855002835,
+     "mean_fp_spacing_hz": 199.99959737062454,
+     "songs": 20
+    }
+   },
+   "trace_bands": [
+    "2-5 kHz",
+    "5-16 kHz",
+    "16-20 kHz"
+   ]
+  },
+  "mureka": {
+   "songs": 50,
+   "sample_rates": [
+    44100
+   ],
+   "top_khz_median": 18.47548828125,
+   "bands": {
+    "0.5-2 kHz": {
+     "beat_real_95": 0.1,
+     "median_comb": 5.251752417072716,
+     "mean_fp_comb": 4.927379890532276,
+     "mean_fp_spacing_hz": 73.53352168574929,
+     "songs": 50
+    },
+    "2-5 kHz": {
+     "beat_real_95": 0.04,
+     "median_comb": 4.952789087216749,
+     "mean_fp_comb": 5.82011171209829,
+     "mean_fp_spacing_hz": 1250.238667242229,
+     "songs": 50
+    },
+    "5-16 kHz": {
+     "beat_real_95": 0.04,
+     "median_comb": 4.603244689805699,
+     "mean_fp_comb": 10.143393136561118,
+     "mean_fp_spacing_hz": 299.99879193580097,
+     "songs": 50
+    },
+    "16-20 kHz": {
+     "beat_real_95": 0.06,
+     "median_comb": 5.046136193706298,
+     "mean_fp_comb": 5.8287601523750485,
+     "mean_fp_spacing_hz": 114.6439109724015,
+     "songs": 50
+    }
+   },
+   "trace_bands": [
+    "5-16 kHz"
+   ]
+  },
+  "lyria3": {
+   "songs": 51,
+   "sample_rates": [
+    44100,
+    48000
+   ],
+   "top_khz_median": 15.78515625,
+   "bands": {
+    "0.5-2 kHz": {
+     "beat_real_95": 0.0784313725490196,
+     "median_comb": 5.372249067990481,
+     "mean_fp_comb": 3.7624289070591064,
+     "mean_fp_spacing_hz": 196.25817239284515,
+     "songs": 51
+    },
+    "2-5 kHz": {
+     "beat_real_95": 0.0196078431372549,
+     "median_comb": 4.906218551199718,
+     "mean_fp_comb": 6.009419961266632,
+     "mean_fp_spacing_hz": 174.66162145137787,
+     "songs": 51
+    },
+    "5-16 kHz": {
+     "beat_real_95": 0.0,
+     "median_comb": 4.4409711337800255,
+     "mean_fp_comb": 5.137830824856399,
+     "mean_fp_spacing_hz": 1969.156801700592,
+     "songs": 51
+    },
+    "16-20 kHz": {
+     "beat_real_95": 0.0,
+     "median_comb": 0.0,
+     "mean_fp_comb": 2.1833411786518693,
+     "mean_fp_spacing_hz": 21.32322004597102,
+     "songs": 51
+    }
+   },
+   "trace_bands": []
+  }
+ }
+}

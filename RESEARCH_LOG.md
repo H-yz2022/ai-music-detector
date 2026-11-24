@@ -1096,6 +1096,29 @@ songs, or because its trace is faint? Each weak family is split into 3 folds by 
   used; Lyria 3 has 51 (sleeping-ai/Lyria3); no Mubert dataset was found. Only Sonauto has many more
   (ai-music-deduplicated: 26 GB, 500 songs used so far).
 
+### Is the faint generators' trace somewhere else in the spectrum? (fullband_probe.py)
+
+The first 60 s of 50 Mureka, 51 Lyria 3, 20 Suno V5.5 (a known comb, as a check) and 50 real Jamendo songs (252 MB
+streamed, nothing saved). Fakeprint and precise comb in four bands. "Beat real" = share of songs whose precise comb
+is above 95% of the real songs (5% by chance). "Mean-fp comb" = the precise comb of the generator's average
+fakeprint: peaks at the same place in every song add up there (real songs: about 4.4).
+
+| | 0.5–2 kHz | 2–5 kHz | 5–16 kHz (used now) | 16–20 kHz | Top of content |
+|---|---|---|---|---|---|
+| Real | 6% · 4.5 | 6% · 4.3 | 6% · 4.3 | 6% · 4.5 | 18.4 kHz |
+| Suno V5.5 (check) | 10% · 5.0 | **90% · 15.6 (200 Hz)** | **90% · 17.3 (200 Hz)** | 25% · 12.1 (200 Hz) | 17.3 kHz |
+| Mureka | 10% · 4.9 | 4% · 5.8 | 4% · **10.1 (300 Hz)** | 6% · 5.8 | 18.5 kHz |
+| Lyria 3 | 8% · 3.8 | 2% · 6.0 | 0% · 5.1 | 0% · 2.2 | 15.8 kHz |
+
+**What this means:**
+- **No other band helps.** The check works (Suno's 200 Hz comb shows up in three bands), but neither Mureka nor
+  Lyria has more of a trace below 5 kHz or above 16 kHz.
+- **Mureka has a comb, at exactly 300 Hz in 5–16 kHz, but it is too faint to see in one song** (4% of songs beat
+  the real songs); it only appears when 50 songs are averaged. That fits "37% caught even when trained on". A check
+  that looks only at that one known spacing, or a longer average (whole song), may find it in single songs.
+- **Lyria 3 shows nothing anywhere** (and its files stop at about 16 kHz). Its audio is probably made in a way that
+  leaves no upsampling comb, so the fakeprint method cannot catch it; it needs a different kind of detector.
+
 ## Status and next steps (Nov 24, 2026)
 
 - Bump removal (`remove_bumps()`, `comb_score(..., bump_hz=15)`) and the precise comb (`precise_comb()`) are in
@@ -1133,6 +1156,7 @@ songs, or because its trace is faint? Each weak family is split into 3 folds by 
      Next: calibrate the whole song on more varied complete real songs, then check it again on new songs.
   9. Done: stretch augmentation (`stretch_test.py`): worse everywhere, not used. Learning curve
      (`learning_test.py`): new generators need their own songs; Mureka, Lyria and Mubert stay weak even then.
+     Full-band check (`fullband_probe.py`): no other band helps; Mureka has a faint 300 Hz comb, Lyria 3 none.
   6. fresh44 and the live concerts have now also been used to judge the new features, so a model chosen from
      these results needs a new, unused test set.
 
@@ -1312,6 +1336,7 @@ the model can learn "MP3 vs WAV" instead of "AI vs real".
 | `wholecheck_test.py` | Checks whole-song `predict` on a new test set (new real songs, unused Suno V5.5 / MiniMax songs; `--build` streams them) → `reports\wholecheck_test.json` |
 | `stretch_test.py` | Frequency-stretch augmentation of the training fakeprints (±3%, ±10%) vs none → `reports\stretch_test.json` (full run) |
 | `learning_test.py` | Learning curve for the weak generators: share caught vs how many of their songs are trained on → `reports\learning_test.json` |
+| `fullband_probe.py` | Mureka / Lyria 3 / Suno / real songs: fakeprint and precise comb in four bands (0.5–20 kHz), 60 s each streamed → `reports/fullband_probe.json` |
 | `robust_test.py` | Robustness: 220 songs changed 11 ways (speed, pitch, tempo, MP3/Ogg re-encode, EQ, noise), scored by every model → `reports\robust_test.json` (`--rescore` re-scores saved fakeprints) |
 | `more_real.py` | 1,500 more varied real songs (FMA large, Internet Archive netlabels and Live Music Archive), fakeprints only → `features_hq\more_real\` |
 | `more44_test.py` | 2,762 more AI songs (Udio, Mureka, HeartMuLa, Sonauto, Lyria Pro 3) read from tar, parquet and single files; before/after tests (`--family`: per-family classifier) |
