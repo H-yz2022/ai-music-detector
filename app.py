@@ -79,8 +79,8 @@ with st.container(horizontal=True):
               help="The model's raw score from 0 to 1. It is not a true probability; the comparison with "
                    "human-made songs is easier to read.")
     st.metric("Part of the song checked", minutes(r["seconds"]), border=True,
-              help=f"How: {r['how']}. Up to the first 4 minutes are cut into 30-second parts, each part is scored, "
-                   "and the middle score counts.")
+              help=f"How: {r['how']}." + (" Up to the first 4 minutes are cut into 30-second parts, each part is "
+                                            "scored, and the middle score counts." if r["rank"] is not None else ""))
 
 # The chart: the song's fingerprint in the main band
 name, freqs, fp, spacing = r["bands"][0]
