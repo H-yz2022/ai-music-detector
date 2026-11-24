@@ -1119,6 +1119,42 @@ fakeprint: peaks at the same place in every song add up there (real songs: about
 - **Lyria 3 shows nothing anywhere** (and its files stop at about 16 kHz). Its audio is probably made in a way that
   leaves no upsampling comb, so the fakeprint method cannot catch it; it needs a different kind of detector.
 
+### A comb check aimed at known spacings (known_spacing_test.py)
+
+The precise comb searches every spacing from 20 to 2000 Hz and keeps the best, so real songs also get a high "best"
+by chance. If a generator's spacing is known, checking only that spacing is fairer. For each of the 16 AI families,
+the spacing comes from the mean fakeprint of half its songs (by group); the other half is tested. The 13 families
+with a clear comb in that mean form a **bank** of known spacings (e.g. Suno, Brev and ElevenLabs all at 200 Hz;
+ACE-Step and Stable Audio at 172.27 Hz; Udio 23.44 Hz; Mureka 600 Hz). Lyria, Mubert and Producer have no clear comb.
+"bank" = the song's best known-spacing score over all 13 spacings. Stored 30 s fakeprints, no download. All at 5% of
+real training songs flagged:
+
+| AI caught (test halves) | Known spacing (own) | Precise comb (now) | Bank | Classifier (LR) | Classifier + precise | **Classifier + bank** |
+|---|---|---|---|---|---|---|
+| Mureka | **27.5%** | 2.4% | 28.4% | 35.3% | 26.6% | 32.9% |
+| Udio | 75.7% | 0.1% | 63.9% | 93.8% | 90.2% | 91.5% |
+| Sonauto | 73.6% | 16.0% | 64.0% | 77.2% | 66.0% | 76.8% |
+| ElevenLabs | 97.3% | 62.0% | 90.7% | 82.7% | 82.0% | **94.0%** |
+| AudioLDM | 99.7% | 20.4% | 92.9% | 100% | 99.3% | 99.7% |
+| Lyria / Mubert | – | 2 / 1% | 2 / 3% | 42 / 12% | 30 / 11% | 28 / 12% |
+| **All AI** | – | 35.5% | **75.6%** | 87.5% | 84.6% | **87.2%** |
+| **Real songs never used, flagged** (1,903: fresh44, 1,077 new, live) | – | 5.4% | 4.9% | 6.5% | 6.4% | **5.5%** |
+
+Both rules fixed before running pass: known spacing catches 25 points more Mureka than the precise comb (rule: +15),
+and classifier + bank catches 2.6 points more AI than classifier + precise comb with 5.5% of never-used real songs
+flagged (rule: at most 6%).
+
+**What this means:**
+- **Knowing the spacing makes the comb far stronger:** the bank alone catches 75.6% of AI songs with no classifier
+  at all (the precise comb: 35.5%), with fewer false alarms (4.9%).
+- **Classifier + bank beats today's joint rule** (+2.6 points of AI) **and flags fewer real songs** (5.5% vs 6.4%,
+  even fewer than the classifier alone). The bank also says which spacing matched, i.e. which kind of decoder.
+- **Mureka's faint comb is now found in about 1 song in 4** (2.4% → 27.5%), but the classifier is still a bit better
+  on Mureka. Lyria and Mubert stay out of reach: no comb.
+- **Limits:** the bank only knows spacings it has seen (a new generator is caught only if it shares a decoder rate
+  with a known one), and an exact spacing moves with a speed change, where the precise comb survives. Not yet
+  checked on fresh44's AI songs or the robustness songs.
+
 ## Status and next steps (Nov 24, 2026)
 
 - Bump removal (`remove_bumps()`, `comb_score(..., bump_hz=15)`) and the precise comb (`precise_comb()`) are in
@@ -1157,6 +1193,9 @@ fakeprint: peaks at the same place in every song add up there (real songs: about
   9. Done: stretch augmentation (`stretch_test.py`): worse everywhere, not used. Learning curve
      (`learning_test.py`): new generators need their own songs; Mureka, Lyria and Mubert stay weak even then.
      Full-band check (`fullband_probe.py`): no other band helps; Mureka has a faint 300 Hz comb, Lyria 3 none.
+     Known-spacing bank (`known_spacing_test.py`): classifier + bank catches 87.2% vs 84.6% (classifier + precise
+     comb) with fewer false alarms (5.5% vs 6.4%). Next: check it on fresh44's AI and the robustness songs, then
+     use it in `predict --joint`.
   6. fresh44 and the live concerts have now also been used to judge the new features, so a model chosen from
      these results needs a new, unused test set.
 
@@ -1337,6 +1376,7 @@ the model can learn "MP3 vs WAV" instead of "AI vs real".
 | `stretch_test.py` | Frequency-stretch augmentation of the training fakeprints (±3%, ±10%) vs none → `reports\stretch_test.json` (full run) |
 | `learning_test.py` | Learning curve for the weak generators: share caught vs how many of their songs are trained on → `reports\learning_test.json` |
 | `fullband_probe.py` | Mureka / Lyria 3 / Suno / real songs: fakeprint and precise comb in four bands (0.5–20 kHz), 60 s each streamed → `reports/fullband_probe.json` |
+| `known_spacing_test.py` | Comb check at known spacings (a bank learned from half of each family's songs) vs the precise comb, alone and with the classifier → `reports/known_spacing_test.json` |
 | `robust_test.py` | Robustness: 220 songs changed 11 ways (speed, pitch, tempo, MP3/Ogg re-encode, EQ, noise), scored by every model → `reports\robust_test.json` (`--rescore` re-scores saved fakeprints) |
 | `more_real.py` | 1,500 more varied real songs (FMA large, Internet Archive netlabels and Live Music Archive), fakeprints only → `features_hq\more_real\` |
 | `more44_test.py` | 2,762 more AI songs (Udio, Mureka, HeartMuLa, Sonauto, Lyria Pro 3) read from tar, parquet and single files; before/after tests (`--family`: per-family classifier) |
