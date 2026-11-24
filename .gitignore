@@ -1,0 +1,30 @@
+# Audio and features: other people's music and large files, downloaded when needed (see RESEARCH_LOG.md)
+data/
+data_fresh/
+datasets/
+features/
+features_hq/
+features_tm/
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.npz
+!demo_models/*.npz
+
+# Built or regenerated
+dist/
+reports/*.html
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Old and side models (predict uses model_twoband.joblib and model_family.joblib; the web demo uses demo_models/)
+*.joblib
+!model_twoband.joblib
+!model_family.joblib
+
+# Local settings
+.claude/
+.venv/
+.streamlit/secrets.toml

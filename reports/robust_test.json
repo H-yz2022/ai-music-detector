@@ -1,0 +1,372 @@
+{
+ "songs": {
+  "real": 100,
+  "suno_v5.5": 40,
+  "minimax3": 40,
+  "udio": 40
+ },
+ "results": {
+  "clean": {
+   "default": {
+    "real": 8.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 87.5,
+    "udio": 95.0
+   },
+   "joint": {
+    "real": 9.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 95.0,
+    "udio": 95.0
+   },
+   "per family": {
+    "real": 4.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 67.5,
+    "udio": 95.0
+   },
+   "comb": {
+    "real": 10.0,
+    "suno_v5.5": 90.0,
+    "minimax3": 95.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 200.0,
+    "minimax3": 689.07
+   }
+  },
+  "speed -3%": {
+   "default": {
+    "real": 11.0,
+    "suno_v5.5": 35.0,
+    "minimax3": 2.5,
+    "udio": 7.5
+   },
+   "joint": {
+    "real": 6.0,
+    "suno_v5.5": 90.0,
+    "minimax3": 95.0,
+    "udio": 2.5
+   },
+   "per family": {
+    "real": 4.0,
+    "suno_v5.5": 27.5,
+    "minimax3": 5.0,
+    "udio": 20.0
+   },
+   "comb": {
+    "real": 10.0,
+    "suno_v5.5": 97.5,
+    "minimax3": 95.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 194.0,
+    "minimax3": 668.38
+   }
+  },
+  "speed -1%": {
+   "default": {
+    "real": 2.0,
+    "suno_v5.5": 10.0,
+    "minimax3": 10.0,
+    "udio": 0.0
+   },
+   "joint": {
+    "real": 5.0,
+    "suno_v5.5": 85.0,
+    "minimax3": 87.5,
+    "udio": 0.0
+   },
+   "per family": {
+    "real": 4.0,
+    "suno_v5.5": 27.5,
+    "minimax3": 17.5,
+    "udio": 10.0
+   },
+   "comb": {
+    "real": 12.0,
+    "suno_v5.5": 92.5,
+    "minimax3": 95.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 396.0,
+    "minimax3": 682.18
+   }
+  },
+  "speed +1%": {
+   "default": {
+    "real": 3.0,
+    "suno_v5.5": 7.5,
+    "minimax3": 0.0,
+    "udio": 7.5
+   },
+   "joint": {
+    "real": 5.0,
+    "suno_v5.5": 92.5,
+    "minimax3": 90.0,
+    "udio": 0.0
+   },
+   "per family": {
+    "real": 6.0,
+    "suno_v5.5": 22.5,
+    "minimax3": 15.0,
+    "udio": 5.0
+   },
+   "comb": {
+    "real": 10.0,
+    "suno_v5.5": 97.5,
+    "minimax3": 95.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 202.0,
+    "minimax3": 695.95
+   }
+  },
+  "speed +3%": {
+   "default": {
+    "real": 3.0,
+    "suno_v5.5": 5.0,
+    "minimax3": 2.5,
+    "udio": 0.0
+   },
+   "joint": {
+    "real": 5.0,
+    "suno_v5.5": 82.5,
+    "minimax3": 92.5,
+    "udio": 0.0
+   },
+   "per family": {
+    "real": 5.0,
+    "suno_v5.5": 22.5,
+    "minimax3": 22.5,
+    "udio": 5.0
+   },
+   "comb": {
+    "real": 10.0,
+    "suno_v5.5": 92.5,
+    "minimax3": 95.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 411.99,
+    "minimax3": 709.74
+   }
+  },
+  "pitch -1 st": {
+   "default": {
+    "real": 7.0,
+    "suno_v5.5": 5.0,
+    "minimax3": 20.0,
+    "udio": 2.5
+   },
+   "joint": {
+    "real": 3.0,
+    "suno_v5.5": 22.5,
+    "minimax3": 47.5,
+    "udio": 0.0
+   },
+   "per family": {
+    "real": 2.0,
+    "suno_v5.5": 25.0,
+    "minimax3": 10.0,
+    "udio": 20.0
+   },
+   "comb": {
+    "real": 5.0,
+    "suno_v5.5": 62.5,
+    "minimax3": 92.5,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 377.55,
+    "minimax3": 650.38
+   }
+  },
+  "pitch +1 st": {
+   "default": {
+    "real": 4.0,
+    "suno_v5.5": 15.0,
+    "minimax3": 12.5,
+    "udio": 5.0
+   },
+   "joint": {
+    "real": 2.0,
+    "suno_v5.5": 30.0,
+    "minimax3": 40.0,
+    "udio": 2.5
+   },
+   "per family": {
+    "real": 11.0,
+    "suno_v5.5": 40.0,
+    "minimax3": 35.0,
+    "udio": 10.0
+   },
+   "comb": {
+    "real": 3.0,
+    "suno_v5.5": 72.5,
+    "minimax3": 85.0,
+    "udio": 2.5
+   },
+   "spacing": {
+    "suno_v5.5": 423.78,
+    "minimax3": 730.05
+   }
+  },
+  "tempo +5%": {
+   "default": {
+    "real": 18.0,
+    "suno_v5.5": 95.0,
+    "minimax3": 55.0,
+    "udio": 67.5
+   },
+   "joint": {
+    "real": 10.0,
+    "suno_v5.5": 92.5,
+    "minimax3": 50.0,
+    "udio": 47.5
+   },
+   "per family": {
+    "real": 19.0,
+    "suno_v5.5": 97.5,
+    "minimax3": 60.0,
+    "udio": 92.5
+   },
+   "comb": {
+    "real": 7.0,
+    "suno_v5.5": 70.0,
+    "minimax3": 30.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 400.0,
+    "minimax3": 689.06
+   }
+  },
+  "MP3 128k": {
+   "default": {
+    "real": 10.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 67.5,
+    "udio": 87.5
+   },
+   "joint": {
+    "real": 7.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 95.0,
+    "udio": 80.0
+   },
+   "per family": {
+    "real": 6.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 57.5,
+    "udio": 92.5
+   },
+   "comb": {
+    "real": 13.0,
+    "suno_v5.5": 95.0,
+    "minimax3": 95.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 200.0,
+    "minimax3": 689.07
+   }
+  },
+  "Ogg 150k": {
+   "default": {
+    "real": 7.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 72.5,
+    "udio": 95.0
+   },
+   "joint": {
+    "real": 5.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 97.5,
+    "udio": 87.5
+   },
+   "per family": {
+    "real": 7.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 70.0,
+    "udio": 95.0
+   },
+   "comb": {
+    "real": 11.0,
+    "suno_v5.5": 90.0,
+    "minimax3": 95.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 200.0,
+    "minimax3": 689.07
+   }
+  },
+  "EQ": {
+   "default": {
+    "real": 7.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 87.5,
+    "udio": 95.0
+   },
+   "joint": {
+    "real": 9.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 97.5,
+    "udio": 90.0
+   },
+   "per family": {
+    "real": 5.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 67.5,
+    "udio": 92.5
+   },
+   "comb": {
+    "real": 12.0,
+    "suno_v5.5": 97.5,
+    "minimax3": 95.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 200.0,
+    "minimax3": 689.06
+   }
+  },
+  "noise 30 dB": {
+   "default": {
+    "real": 4.0,
+    "suno_v5.5": 87.5,
+    "minimax3": 47.5,
+    "udio": 80.0
+   },
+   "joint": {
+    "real": 5.0,
+    "suno_v5.5": 75.0,
+    "minimax3": 55.0,
+    "udio": 70.0
+   },
+   "per family": {
+    "real": 7.0,
+    "suno_v5.5": 90.0,
+    "minimax3": 22.5,
+    "udio": 90.0
+   },
+   "comb": {
+    "real": 8.0,
+    "suno_v5.5": 55.0,
+    "minimax3": 55.0,
+    "udio": 0.0
+   },
+   "spacing": {
+    "suno_v5.5": 200.0,
+    "minimax3": 689.06
+   }
+  }
+ },
+ "model": "model_twoband.joblib",
+ "family_model": "model_twoband_family.joblib"
+}

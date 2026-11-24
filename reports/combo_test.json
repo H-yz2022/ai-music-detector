@@ -1,0 +1,431 @@
+{
+ "cv": {
+  "acestep": {
+   "one boundary": 1.0,
+   "per family": 1.0,
+   "max": 1.0,
+   "mean": 1.0,
+   "one boundary + comb": 1.0,
+   "per family + comb": 1.0,
+   "max + comb": 1.0
+  },
+  "audioldm": {
+   "one boundary": 1.0,
+   "per family": 1.0,
+   "max": 1.0,
+   "mean": 1.0,
+   "one boundary + comb": 0.9914821124361158,
+   "per family + comb": 1.0,
+   "max + comb": 1.0
+  },
+  "brev": {
+   "one boundary": 0.9496644295302014,
+   "per family": 0.9630872483221476,
+   "max": 0.9563758389261745,
+   "mean": 0.9630872483221476,
+   "one boundary + comb": 0.9093959731543624,
+   "per family + comb": 0.9261744966442953,
+   "max + comb": 0.9261744966442953
+  },
+  "diffrhythm": {
+   "one boundary": 0.9983164983164983,
+   "per family": 1.0,
+   "max": 1.0,
+   "mean": 1.0,
+   "one boundary + comb": 0.9915824915824916,
+   "per family + comb": 0.9983164983164983,
+   "max + comb": 0.9983164983164983
+  },
+  "elevenlabs": {
+   "one boundary": 0.8733333333333333,
+   "per family": 0.9,
+   "max": 0.8833333333333333,
+   "mean": 0.89,
+   "one boundary + comb": 0.8166666666666667,
+   "per family + comb": 0.8433333333333334,
+   "max + comb": 0.83
+  },
+  "heartmula": {
+   "one boundary": 1.0,
+   "per family": 1.0,
+   "max": 1.0,
+   "mean": 1.0,
+   "one boundary + comb": 1.0,
+   "per family + comb": 1.0,
+   "max + comb": 1.0
+  },
+  "lyria_pro3": {
+   "one boundary": 0.38,
+   "per family": 0.43,
+   "max": 0.38,
+   "mean": 0.44,
+   "one boundary + comb": 0.17,
+   "per family + comb": 0.14,
+   "max + comb": 0.17
+  },
+  "mubert": {
+   "one boundary": 0.16778523489932887,
+   "per family": 0.16778523489932887,
+   "max": 0.18120805369127516,
+   "mean": 0.18120805369127516,
+   "one boundary + comb": 0.09395973154362416,
+   "per family + comb": 0.12751677852348994,
+   "max + comb": 0.12751677852348994
+  },
+  "mureka_v9": {
+   "one boundary": 0.3987915407854985,
+   "per family": 0.4954682779456193,
+   "max": 0.44410876132930516,
+   "mean": 0.4743202416918429,
+   "one boundary + comb": 0.24622356495468278,
+   "per family + comb": 0.31722054380664655,
+   "max + comb": 0.3081570996978852
+  },
+  "musicgen": {
+   "one boundary": 1.0,
+   "per family": 1.0,
+   "max": 1.0,
+   "mean": 1.0,
+   "one boundary + comb": 1.0,
+   "per family + comb": 1.0,
+   "max + comb": 1.0
+  },
+  "producer": {
+   "one boundary": 0.95,
+   "per family": 0.9766666666666667,
+   "max": 0.97,
+   "mean": 0.9733333333333334,
+   "one boundary + comb": 0.8933333333333333,
+   "per family + comb": 0.9433333333333334,
+   "max + comb": 0.9433333333333334
+  },
+  "sonauto": {
+   "one boundary": 0.738,
+   "per family": 0.84,
+   "max": 0.816,
+   "mean": 0.806,
+   "one boundary + comb": 0.568,
+   "per family + comb": 0.672,
+   "max + comb": 0.666
+  },
+  "songgen": {
+   "one boundary": 0.9838998211091234,
+   "per family": 1.0,
+   "max": 1.0,
+   "mean": 0.9964221824686941,
+   "one boundary + comb": 0.9731663685152058,
+   "per family + comb": 0.998211091234347,
+   "max + comb": 0.9964221824686941
+  },
+  "stableaudio": {
+   "one boundary": 0.8917525773195877,
+   "per family": 0.9381443298969072,
+   "max": 0.9278350515463918,
+   "mean": 0.9278350515463918,
+   "one boundary + comb": 0.7525773195876289,
+   "per family + comb": 0.7938144329896907,
+   "max + comb": 0.8041237113402062
+  },
+  "suno": {
+   "one boundary": 0.9866666666666667,
+   "per family": 0.9966666666666667,
+   "max": 0.9966666666666667,
+   "mean": 0.9966666666666667,
+   "one boundary + comb": 0.9733333333333334,
+   "per family + comb": 0.9866666666666667,
+   "max + comb": 0.9766666666666667
+  },
+  "udio": {
+   "one boundary": 0.7666666666666667,
+   "per family": 0.8766666666666667,
+   "max": 0.86,
+   "mean": 0.84,
+   "one boundary + comb": 0.6066666666666667,
+   "per family + comb": 0.7566666666666667,
+   "max + comb": 0.7433333333333333
+  },
+  "udio_new": {
+   "one boundary": 0.969,
+   "per family": 0.984,
+   "max": 0.982,
+   "mean": 0.978,
+   "one boundary + comb": 0.923,
+   "per family + comb": 0.972,
+   "max + comb": 0.97
+  },
+  "ALL AI": {
+   "one boundary": 0.8728027681660899,
+   "per family": 0.9018685121107266,
+   "max": 0.8925951557093426,
+   "mean": 0.8945328719723183,
+   "one boundary + comb": 0.8168858131487889,
+   "per family + comb": 0.8525951557093425,
+   "max + comb": 0.8501038062283737
+  },
+  "real fma_large": {
+   "one boundary": 0.06050420168067227,
+   "per family": 0.052100840336134456,
+   "max": 0.05546218487394958,
+   "mean": 0.05546218487394958,
+   "one boundary + comb": 0.05714285714285714,
+   "per family + comb": 0.052100840336134456,
+   "max + comb": 0.05546218487394958
+  },
+  "real fma_small": {
+   "one boundary": 0.04915125411705092,
+   "per family": 0.05016468203699012,
+   "max": 0.049784646567012925,
+   "mean": 0.049784646567012925,
+   "one boundary + comb": 0.04737775525715734,
+   "per family + comb": 0.04813782619711173,
+   "max + comb": 0.04801114770711933
+  },
+  "real netlabels": {
+   "one boundary": 0.05227272727272727,
+   "per family": 0.045454545454545456,
+   "max": 0.04772727272727273,
+   "mean": 0.045454545454545456,
+   "one boundary + comb": 0.08863636363636364,
+   "per family + comb": 0.07727272727272727,
+   "max + comb": 0.07954545454545454
+  },
+  "ALL REAL": {
+   "one boundary": 0.05006159704334192,
+   "per family": 0.05006159704334192,
+   "max": 0.05006159704334192,
+   "mean": 0.04994960241908388,
+   "one boundary + comb": 0.05006159704334192,
+   "per family + comb": 0.04983760779482585,
+   "max + comb": 0.05006159704334192
+  }
+ },
+ "fresh": {
+  "lyria3": {
+   "one boundary": 0.21568627450980393,
+   "per family": 0.17647058823529413,
+   "max": 0.1568627450980392,
+   "mean": 0.17647058823529413,
+   "one boundary + comb": 0.09803921568627451,
+   "per family + comb": 0.058823529411764705,
+   "max + comb": 0.058823529411764705
+  },
+  "minimax3": {
+   "one boundary": 0.7946428571428571,
+   "per family": 0.7142857142857143,
+   "max": 0.7589285714285714,
+   "mean": 0.7946428571428571,
+   "one boundary + comb": 0.9375,
+   "per family + comb": 0.9375,
+   "max + comb": 0.9375
+  },
+  "real_fma": {
+   "one boundary": 0.053691275167785234,
+   "per family": 0.053691275167785234,
+   "max": 0.050335570469798654,
+   "mean": 0.050335570469798654,
+   "one boundary + comb": 0.07046979865771812,
+   "per family + comb": 0.06375838926174497,
+   "max + comb": 0.06040268456375839
+  },
+  "real_jamendo": {
+   "one boundary": 0.06329113924050633,
+   "per family": 0.0379746835443038,
+   "max": 0.06329113924050633,
+   "mean": 0.06329113924050633,
+   "one boundary + comb": 0.0379746835443038,
+   "per family + comb": 0.02531645569620253,
+   "max + comb": 0.0379746835443038
+  },
+  "suno_v5.5": {
+   "one boundary": 0.9733333333333334,
+   "per family": 0.9933333333333333,
+   "max": 0.9866666666666667,
+   "mean": 0.98,
+   "one boundary + comb": 0.9733333333333334,
+   "per family + comb": 0.9733333333333334,
+   "max + comb": 0.9733333333333334
+  },
+  "ALL REAL": {
+   "one boundary": 0.05570291777188329,
+   "per family": 0.050397877984084884,
+   "max": 0.05305039787798409,
+   "mean": 0.05305039787798409,
+   "one boundary + comb": 0.0636604774535809,
+   "per family + comb": 0.05570291777188329,
+   "max + comb": 0.05570291777188329
+  },
+  "held etree": {
+   "one boundary": 0.07126948775055679,
+   "per family": 0.051224944320712694,
+   "max": 0.060133630289532294,
+   "mean": 0.0645879732739421,
+   "one boundary + comb": 0.031180400890868598,
+   "per family + comb": 0.0378619153674833,
+   "max + comb": 0.035634743875278395
+  }
+ },
+ "logo": {
+  "acestep": {
+   "one boundary": 1.0,
+   "per family": 1.0,
+   "max": 1.0,
+   "mean": 1.0,
+   "one boundary + comb": 1.0,
+   "per family + comb": 1.0,
+   "max + comb": 1.0
+  },
+  "audioldm": {
+   "one boundary": 0.9778534923339012,
+   "per family": 0.9982964224872232,
+   "max": 0.9931856899488927,
+   "mean": 0.9931856899488927,
+   "one boundary + comb": 0.9880749574105622,
+   "per family + comb": 0.9778534923339012,
+   "max + comb": 0.979557069846678
+  },
+  "brev": {
+   "one boundary": 0.9194630872483222,
+   "per family": 0.9362416107382551,
+   "max": 0.9362416107382551,
+   "mean": 0.9295302013422819,
+   "one boundary + comb": 0.8926174496644296,
+   "per family + comb": 0.9060402684563759,
+   "max + comb": 0.889261744966443
+  },
+  "diffrhythm": {
+   "one boundary": 0.9814814814814815,
+   "per family": 0.9545454545454546,
+   "max": 0.9747474747474747,
+   "mean": 0.9781144781144782,
+   "one boundary + comb": 0.82996632996633,
+   "per family + comb": 0.8585858585858586,
+   "max + comb": 0.8602693602693603
+  },
+  "elevenlabs": {
+   "one boundary": 0.7666666666666667,
+   "per family": 0.6666666666666666,
+   "max": 0.7333333333333333,
+   "mean": 0.7333333333333333,
+   "one boundary + comb": 0.7166666666666667,
+   "per family + comb": 0.6233333333333333,
+   "max + comb": 0.67
+  },
+  "heartmula": {
+   "one boundary": 0.996,
+   "per family": 0.996,
+   "max": 0.996,
+   "mean": 0.996,
+   "one boundary + comb": 1.0,
+   "per family + comb": 1.0,
+   "max + comb": 1.0
+  },
+  "lyria": {
+   "one boundary": 0.31,
+   "per family": 0.39,
+   "max": 0.4,
+   "mean": 0.36,
+   "one boundary + comb": 0.14,
+   "per family + comb": 0.08,
+   "max + comb": 0.15
+  },
+  "mubert": {
+   "one boundary": 0.040268456375838924,
+   "per family": 0.053691275167785234,
+   "max": 0.053691275167785234,
+   "mean": 0.040268456375838924,
+   "one boundary + comb": 0.006711409395973154,
+   "per family + comb": 0.013422818791946308,
+   "max + comb": 0.006711409395973154
+  },
+  "mureka": {
+   "one boundary": 0.2190332326283988,
+   "per family": 0.2280966767371601,
+   "max": 0.20694864048338368,
+   "mean": 0.2719033232628399,
+   "one boundary + comb": 0.08459214501510574,
+   "per family + comb": 0.0755287009063444,
+   "max + comb": 0.09365558912386707
+  },
+  "musicgen": {
+   "one boundary": 1.0,
+   "per family": 1.0,
+   "max": 1.0,
+   "mean": 1.0,
+   "one boundary + comb": 1.0,
+   "per family + comb": 0.9982964224872232,
+   "max + comb": 1.0
+  },
+  "producer": {
+   "one boundary": 0.8433333333333334,
+   "per family": 0.7933333333333333,
+   "max": 0.84,
+   "mean": 0.84,
+   "one boundary + comb": 0.7966666666666666,
+   "per family + comb": 0.5366666666666666,
+   "max + comb": 0.7366666666666667
+  },
+  "sonauto": {
+   "one boundary": 0.376,
+   "per family": 0.222,
+   "max": 0.334,
+   "mean": 0.31,
+   "one boundary + comb": 0.202,
+   "per family + comb": 0.164,
+   "max + comb": 0.202
+  },
+  "songgen": {
+   "one boundary": 0.7441860465116279,
+   "per family": 0.8407871198568873,
+   "max": 0.8085867620751341,
+   "mean": 0.8211091234347049,
+   "one boundary + comb": 0.9212880143112702,
+   "per family + comb": 0.9445438282647585,
+   "max + comb": 0.9177101967799642
+  },
+  "stableaudio": {
+   "one boundary": 0.6082474226804123,
+   "per family": 0.42783505154639173,
+   "max": 0.5618556701030928,
+   "mean": 0.5927835051546392,
+   "one boundary + comb": 0.6649484536082474,
+   "per family + comb": 0.5103092783505154,
+   "max + comb": 0.6185567010309279
+  },
+  "suno": {
+   "one boundary": 0.97,
+   "per family": 0.9966666666666667,
+   "max": 0.99,
+   "mean": 0.9966666666666667,
+   "one boundary + comb": 0.96,
+   "per family + comb": 0.9333333333333333,
+   "max + comb": 0.97
+  },
+  "udio": {
+   "one boundary": 0.15461538461538463,
+   "per family": 0.18846153846153846,
+   "max": 0.12923076923076923,
+   "mean": 0.1930769230769231,
+   "one boundary + comb": 0.05076923076923077,
+   "per family + comb": 0.05076923076923077,
+   "max + comb": 0.06769230769230769
+  },
+  "ALL AI": {
+   "one boundary": 0.6491349480968858,
+   "per family": 0.6444290657439447,
+   "max": 0.6465051903114187,
+   "mean": 0.6635294117647059,
+   "one boundary + comb": 0.6013840830449827,
+   "per family + comb": 0.581038062283737,
+   "max + comb": 0.601522491349481
+  },
+  "REAL flagged": {
+   "one boundary": 0.04972238223246288,
+   "per family": 0.05666842677931388,
+   "max": 0.054875512032770093,
+   "mean": 0.05689004096262161,
+   "one boundary + comb": 0.04725662442396313,
+   "per family + comb": 0.04860151049667179,
+   "max + comb": 0.04949836789554532
+  }
+ }
+}

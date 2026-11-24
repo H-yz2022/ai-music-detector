@@ -1,0 +1,116 @@
+{
+ "songs": {
+  "real_fma": 37,
+  "real_jamendo": 79,
+  "all real": 116,
+  "suno_v5.5": 39,
+  "minimax3": 38
+ },
+ "results": {
+  "first 30 s": {
+   "classifier": {
+    "real_fma": 8.1,
+    "real_jamendo": 2.5,
+    "all real": 4.3,
+    "suno_v5.5": 100.0,
+    "minimax3": 84.2
+   },
+   "joint": {
+    "real_fma": 8.1,
+    "real_jamendo": 2.5,
+    "all real": 4.3,
+    "suno_v5.5": 100.0,
+    "minimax3": 92.1
+   },
+   "auc": 0.9737
+  },
+  "middle window": {
+   "classifier": {
+    "real_fma": 2.7,
+    "real_jamendo": 3.8,
+    "all real": 3.4,
+    "suno_v5.5": 100.0,
+    "minimax3": 71.1
+   },
+   "joint": {
+    "real_fma": 2.7,
+    "real_jamendo": 1.3,
+    "all real": 1.7,
+    "suno_v5.5": 100.0,
+    "minimax3": 94.7
+   },
+   "auc": 0.9873
+  },
+  "mean": {
+   "classifier": {
+    "real_fma": 10.8,
+    "real_jamendo": 3.8,
+    "all real": 6.0,
+    "suno_v5.5": 100.0,
+    "minimax3": 100.0
+   },
+   "joint": {
+    "real_fma": 2.7,
+    "real_jamendo": 0.0,
+    "all real": 0.9,
+    "suno_v5.5": 100.0,
+    "minimax3": 94.7
+   },
+   "auc": 0.9966
+  },
+  "median": {
+   "classifier": {
+    "real_fma": 2.7,
+    "real_jamendo": 0.0,
+    "all real": 0.9,
+    "suno_v5.5": 100.0,
+    "minimax3": 97.4
+   },
+   "joint": {
+    "real_fma": 2.7,
+    "real_jamendo": 1.3,
+    "all real": 1.7,
+    "suno_v5.5": 100.0,
+    "minimax3": 94.7
+   },
+   "auc": 0.9974
+  },
+  "whole song": {
+   "classifier": {
+    "real_fma": 18.9,
+    "real_jamendo": 8.9,
+    "all real": 12.1,
+    "suno_v5.5": 100.0,
+    "minimax3": 100.0
+   },
+   "joint": {
+    "real_fma": 18.9,
+    "real_jamendo": 8.9,
+    "all real": 12.1,
+    "suno_v5.5": 100.0,
+    "minimax3": 100.0
+   },
+   "auc": 0.9966
+  },
+  "per_window_real": [
+   4.3,
+   3.4,
+   6.1,
+   3.5,
+   3.6,
+   4.2,
+   5.9,
+   2.3
+  ],
+  "per_window_ai": [
+   92.2,
+   85.7,
+   92.6,
+   87.7,
+   92.3,
+   95.6,
+   96.4,
+   100.0
+  ]
+ }
+}

@@ -1,0 +1,7 @@
+numpy>=2.0
+scipy>=1.13
+scikit-learn>=1.5
+plotly>=5.20
+joblib
+soundfile>=0.12.1  # reads and writes MP3/FLAC/OGG (bundles libsndfile)
+streamlit>=1.67    # only for the web demo (app.py); brings pandas and altair

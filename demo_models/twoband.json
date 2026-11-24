@@ -1,0 +1,108 @@
+{
+ "bands": {
+  "__list__": [
+   {
+    "sr": 16000,
+    "fmin": 1000.0,
+    "fmax": 8000.0,
+    "mp3_level": 0.8,
+    "freqs": {
+     "__array__": "twoband/bands/0/freqs"
+    }
+   },
+   {
+    "sr": 44100,
+    "fmin": 5000.0,
+    "fmax": 16000.0,
+    "mp3_level": 0.4,
+    "freqs": {
+     "__array__": "twoband/bands/1/freqs"
+    }
+   }
+  ]
+ },
+ "max_duration": 30.0,
+ "min_sr": 44100,
+ "cutoff": 0.09980437234044064,
+ "comb_cutoffs": {
+  "__list__": [
+   9.319069671206776,
+   10.349830526371756
+  ]
+ },
+ "n_features": 11254,
+ "real_scores": {
+  "clf": {
+   "__array__": "twoband/real_scores/clf"
+  },
+  "s16": {
+   "__array__": "twoband/real_scores/s16"
+  },
+  "s44": {
+   "__array__": "twoband/real_scores/s44"
+  }
+ },
+ "joint_cutoff": 0.9815525698443165,
+ "real_joint": {
+  "__array__": "twoband/real_joint"
+ },
+ "ai_scores": {
+  "clf": {
+   "__array__": "twoband/ai_scores/clf"
+  },
+  "joint": {
+   "__array__": "twoband/ai_scores/joint"
+  }
+ },
+ "whole": {
+  "real_scores": {
+   "clf": {
+    "__array__": "twoband/whole/real_scores/clf"
+   },
+   "s16": {
+    "__array__": "twoband/whole/real_scores/s16"
+   },
+   "s44": {
+    "__array__": "twoband/whole/real_scores/s44"
+   }
+  },
+  "real_joint": {
+   "__array__": "twoband/whole/real_joint"
+  },
+  "cutoff": 0.339754194021225,
+  "joint_cutoff": 0.9810176991150442,
+  "ai_scores": {
+   "clf": {
+    "__array__": "twoband/whole/ai_scores/clf"
+   },
+   "joint": {
+    "__array__": "twoband/whole/ai_scores/joint"
+   }
+  },
+  "min_seconds": 60.0,
+  "max_seconds": 480.0,
+  "calibrated_on": {
+   "community": 371,
+   "jamendo": 398,
+   "lyria3": 51,
+   "minimax3": 105,
+   "mixtapes": 282,
+   "real_jamendo": 79,
+   "suno_v5.5": 145
+  }
+ },
+ "model": {
+  "coef": {
+   "__array__": "twoband/model/coef"
+  },
+  "intercept": {
+   "__array__": "twoband/model/intercept"
+  },
+  "classes": {
+   "__list__": [
+    "False",
+    "True"
+   ]
+  }
+ }
+}
