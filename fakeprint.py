@@ -181,6 +181,48 @@ def comb_sharpness(f, fp, spacing, n=2000, bump_hz=BUMP_HZ):
     return float((h[i] - h.mean()) / (h.std() + 1e-12)), float(cands[i])
 
 
+KNOWN_WIDTH, KNOWN_CANDS = 0.003, 200  # known-spacing check: +-0.3% around the spacing, 200 candidates
+
+
+def known_comb(f, fps, spacing):
+    """How clearly each fakeprint (rows of fps, on bins f) repeats at one known spacing (known_spacing_test.py).
+
+    Like comb_sharpness, but with no search: the bump-removed fakeprint is averaged at all multiples of each of
+    200 candidate spacings within +-0.3% of `spacing` (the harmonic sum), and the score is the z-score, among all
+    200, of the candidates within 1/4 bin (at the top multiple) of `spacing`. Real songs get no "best of many"
+    bonus, so a faint comb at a known generator's spacing stands out. Returns one score per row.
+    """
+    fps = np.atleast_2d(np.asarray(fps, dtype=np.float32))
+    df = f[1] - f[0]
+    k = max(3, int(round(BUMP_HZ / df)) | 1)
+    x = np.clip(fps - uniform_filter1d(fps, k, axis=1, mode="nearest"), 0.0, None)
+    cands = spacing * (1 + np.linspace(-KNOWN_WIDTH, KNOWN_WIDTH, KNOWN_CANDS))
+    m = np.arange(1, int(f[-1] // (spacing * (1 - KNOWN_WIDTH))) + 2)
+    pos = (cands[:, None] * m[None, :] - f[0]) / df
+    inside = (pos >= 0) & (pos <= len(f) - 1)
+    i0 = np.clip(np.floor(pos).astype(np.int64), 0, len(f) - 2)
+    w = np.clip(pos - i0, 0, 1).astype(np.float32)
+    cnt = np.maximum(inside.sum(1), 1)
+    near = np.abs(cands - spacing) <= 0.25 * df / m[-1] + 1e-9
+    near[np.argmin(np.abs(cands - spacing))] = True
+    chunk = max(10, int(1e7 // (KNOWN_CANDS * len(m))))  # about 40 MB per temporary array
+    out = np.empty(len(x), np.float32)
+    for a in range(0, len(x), chunk):
+        xb = x[a:a + chunk]
+        h = np.where(inside, (1 - w) * xb[:, i0] + w * xb[:, i0 + 1], 0).sum(2) / cnt
+        z = (h - h.mean(1, keepdims=True)) / (h.std(1, keepdims=True) + 1e-12)
+        out[a:a + chunk] = z[:, near].max(1)
+    return out
+
+
+def bank_score(f, fps, bank):
+    """The spacing bank (train_twoband.py): for each known spacing, the known_comb score as the share of real
+    training songs below it; returns (highest share per row, index of the spacing that gave it)."""
+    shares = np.array([np.searchsorted(ref, known_comb(f, fps, s), side="right") / len(ref)
+                       for s, ref in zip(bank["spacings"], bank["real_scores"])])
+    return shares.max(0), shares.argmax(0)
+
+
 def extract(audio, sr, fmin=FMIN, fmax=FMAX):
     """All features for one clip, as a dict."""
     freqs, spec = average_spectrum_db(audio, sr)

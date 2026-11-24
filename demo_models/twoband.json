@@ -54,41 +54,78 @@
    "__array__": "twoband/ai_scores/joint"
   }
  },
- "whole": {
+ "bank": {
+  "spacings": {
+   "__array__": "twoband/bank/spacings"
+  },
+  "names": {
+   "__list__": [
+    "acestep / stableaudio",
+    "audioldm",
+    "brev / elevenlabs / suno",
+    "diffrhythm",
+    "heartmula",
+    "mureka",
+    "musicgen",
+    "producer",
+    "sonauto",
+    "songgen",
+    "udio"
+   ]
+  },
   "real_scores": {
-   "clf": {
-    "__array__": "twoband/whole/real_scores/clf"
-   },
-   "s16": {
-    "__array__": "twoband/whole/real_scores/s16"
-   },
-   "s44": {
-    "__array__": "twoband/whole/real_scores/s44"
-   }
+   "__list__": [
+    {
+     "__array__": "twoband/bank/real_scores/0"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/1"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/2"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/3"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/4"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/5"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/6"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/7"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/8"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/9"
+    },
+    {
+     "__array__": "twoband/bank/real_scores/10"
+    }
+   ]
   },
-  "real_joint": {
-   "__array__": "twoband/whole/real_joint"
+  "real_bank": {
+   "__array__": "twoband/bank/real_bank"
   },
-  "cutoff": 0.339754194021225,
-  "joint_cutoff": 0.9810176991150442,
-  "ai_scores": {
-   "clf": {
-    "__array__": "twoband/whole/ai_scores/clf"
-   },
-   "joint": {
-    "__array__": "twoband/whole/ai_scores/joint"
-   }
+  "clf_bank_cutoff": 0.9726114310087438,
+  "clf_bank_real": {
+   "__array__": "twoband/bank/clf_bank_real"
   },
-  "min_seconds": 60.0,
-  "max_seconds": 480.0,
-  "calibrated_on": {
-   "community": 371,
-   "jamendo": 398,
-   "lyria3": 51,
-   "minimax3": 105,
-   "mixtapes": 282,
-   "real_jamendo": 79,
-   "suno_v5.5": 145
+  "clf_bank_ai": {
+   "__array__": "twoband/bank/clf_bank_ai"
+  },
+  "clf_bank_comb_cutoff": 0.9853007037747921,
+  "clf_bank_comb_real": {
+   "__array__": "twoband/bank/clf_bank_comb_real"
+  },
+  "clf_bank_comb_ai": {
+   "__array__": "twoband/bank/clf_bank_comb_ai"
   }
  },
  "model": {

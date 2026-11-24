@@ -41,6 +41,8 @@ All numbers below were measured on songs the model never trained on.
   Looking for *even spacing* instead survives these changes.
 - Extra features (spectrum shape, stereo, changes over time) looked better on the main tests but raised false
   alarms on new real songs: the model was learning differences between datasets, not AI traces.
+- Checking the comb only at the exact spacings of known generators (a "spacing bank") catches more AI with
+  fewer false alarms than searching every spacing, but a speed change moves the spacing, so it is an option.
 - Scoring the whole song catches more AI (99.7%), but its cut-off didn't hold on new real songs (7% flagged instead
   of 5%). So the default is the median over 30-second parts.
 
@@ -63,6 +65,7 @@ Uploaded files are not stored. There is also a Google Colab version (`demo.ipynb
 python detect.py selftest                 # no data needed: checks the method on synthetic audio
 python detect.py predict song.mp3         # rank among real songs, comb spacing if there is one
 python detect.py predict song.mp3 --joint # classifier or comb (better for new generators with a comb)
+python detect.py predict song.mp3 --bank  # classifier or comb at known generators' spacings (not for sped-up songs)
 python detect.py predict song.mp3 --whole # the whole song instead of 30 s parts (more AI caught, more false alarms)
 ```
 

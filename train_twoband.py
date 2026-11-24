@@ -12,6 +12,9 @@ The cut-off comes from 5-fold cross-validation (real clips grouped by artist):
 it flags 5% of real songs. The precise-comb cut-offs for both bands (5% of real
 songs each) are saved too, so predict can say when a comb stands out.
 
+It also saves a spacing bank (known_spacing_test.py): the exact comb spacing of every generator with a clear
+comb (training generators plus --bank-extra songs), with real-song scores, for predict --bank (bank_check.py).
+
   python -I train_twoband.py --extra-dir features_hq\more_real
       # predict's default, model_twoband.joblib: v1 plus the varied real songs from more_real.py (44.1 kHz or more only)
   python -I train_twoband.py --out model_twoband_v1_old.joblib     # the first v1 (FMA small real songs only)
@@ -37,8 +40,10 @@ from cutoff_test import artists_of  # noqa: E402
 from detect import ai_proba, joint_score  # noqa: E402
 from hq_test import content_top, load, precise_all  # noqa: E402
 from logo_test import fit  # noqa: E402
+from fakeprint import known_comb, precise_comb  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
+BANK_MIN = 8.0  # a generator joins the spacing bank if its mean fakeprint's precise comb is at least this (real: ~4.4)
 
 
 def main():
@@ -56,6 +61,8 @@ def main():
                     help="also train on the songs in these folders or .npz files (features_hq\\more44 from "
                          "more44_test.py: AI songs; features_hq\\more_real from more_real.py: real songs)")
     ap.add_argument("--family", action="store_true", help="one boundary per generator family (multi-class)")
+    ap.add_argument("--bank-extra", nargs="+", default=[str(HERE / "features_hq" / "more44")],
+                    help="AI songs used only to learn comb spacings for the spacing bank (not to train the classifier)")
     args = ap.parse_args()
 
     print("Loading both bands ...")
@@ -162,6 +169,47 @@ def main():
         print(f"  {g:12s} {100 * np.mean(joint[labels == g] > joint_cut):5.1f}%")
     print(f"  {'ALL':12s} {100 * np.mean(joint[y] > joint_cut):5.1f}%")
 
+    # Spacing bank (known_spacing_test.py): each generator's exact comb spacing, from the mean 5-16 kHz fakeprint of
+    # its songs (training generators, plus --bank-extra songs used only for this); kept if that mean has a clear
+    # comb. Each song's bank score = its highest known-comb score over the spacings, as the share of real songs below.
+    n0 = len(bands[0]["freqs"])
+    fh5 = np.asarray(bands[1]["freqs"], dtype=np.float64)
+    groups_fp = {str(g): X[labels == g, n0:] for g in sorted(set(labels[y]))}
+    from more44_test import FAMILY
+    for f in [f for d in (args.bank_extra or []) for f in (sorted(Path(d).glob("*.npz")) if Path(d).is_dir() else [Path(d)])]:
+        d = np.load(f)
+        keep = d["src_sr"] >= bands[1]["sr"]
+        for s in sorted(set(d["sources"][keep].astype(str))):
+            g = FAMILY.get(s, s)
+            rows = d["fp1"][keep & (d["sources"].astype(str) == s)].astype(np.float32)
+            groups_fp[g] = np.vstack([groups_fp[g], rows]) if g in groups_fp else rows
+    bank = {"spacings": [], "names": []}
+    print(f"\nSpacing bank (mean-fakeprint comb >= {BANK_MIN:g}):")
+    for g, rows in sorted(groups_fp.items()):
+        m_sharp, s0 = precise_comb(fh5, rows.mean(0))
+        same = [i for i, s in enumerate(bank["spacings"]) if abs(s - s0) < 0.02]
+        print(f"  {g:12s} {m_sharp:5.1f} at {s0:8.3f} Hz ({len(rows)} songs)"
+              + ("" if m_sharp < BANK_MIN else f"  -> same as {bank['names'][same[0]]}" if same else "  -> bank"))
+        if m_sharp >= BANK_MIN:
+            if same:
+                bank["names"][same[0]] += f" / {g}"
+            else:
+                bank["spacings"].append(float(s0))
+                bank["names"].append(str(g))
+    ks = [known_comb(fh5, X[:, n0:], s) for s in bank["spacings"]]
+    bank["real_scores"] = [np.sort(k[real]).astype(np.float32) for k in ks]
+    pct = lambda ref, x: np.searchsorted(ref, x, side="right") / len(ref)  # noqa: E731
+    b_all = np.max([pct(r, k) for r, k in zip(bank["real_scores"], ks)], 0)
+    bank["real_bank"] = np.sort(b_all[real]).astype(np.float32)
+    clf_p, bank_p = pct(refs["clf"], oof), pct(bank["real_bank"], b_all)
+    for name, js in (("clf_bank", np.maximum(clf_p, bank_p)), ("clf_bank_comb", np.maximum(joint, bank_p))):
+        bank[f"{name}_cutoff"] = float(np.quantile(js[real], q))
+        bank[f"{name}_real"] = np.sort(js[real]).astype(np.float32)
+        bank[f"{name}_ai"] = np.sort(js[y]).astype(np.float32)
+        print(f"  {name}: cut-off {bank[f'{name}_cutoff']:.4f}; AI caught (the bank saw these songs, so high) "
+              f"{100 * np.mean(js[y] > bank[f'{name}_cutoff']):.1f}%")
+    bank["spacings"] = np.array(bank["spacings"])
+
     # Real songs with little high-frequency content (old recordings, low-bitrate files) may look
     # like low-band generators in the 5-16 kHz band: how often are they flagged?
     print("\nReal songs flagged, by how far up they have content:")
@@ -178,6 +226,7 @@ def main():
                  # cross-validated scores, sorted, for predict's percentile and base-rate estimate
                  "real_joint": np.sort(joint[real]).astype(np.float32),
                  "ai_scores": {"clf": np.sort(oof[y]).astype(np.float32), "joint": np.sort(joint[y]).astype(np.float32)},
+                 "bank": bank,
                  "trained_on": {g: int((labels == g).sum()) for g in sorted(set(labels))}}, args.out)
     print(f"Saved {args.out} ({Path(args.out).stat().st_size / 1e6:.1f} MB)")
 

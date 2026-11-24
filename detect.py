@@ -6,6 +6,7 @@
                                                      # lower rates: model_family.joblib (1-8 kHz)
   python detect.py predict song.mp3 --match-format   # low-rate files: first the same 16 kHz, 40 kbps MP3 as our tests
   python detect.py predict song.mp3 --joint          # 44.1 kHz files: classifier or comb (for new generators)
+  python detect.py predict song.mp3 --bank           # 44.1 kHz files: classifier or spacing bank (not after speed changes)
   python detect.py predict song.mp3 --base-rate 0.1  # also a rough chance of AI, if 10% of songs are AI
   44.1 kHz files: the median over 30 s windows (up to 8); --whole: one fakeprint of the whole song (up to 8 min,
   own cut-off; catches more AI but flagged 7% of new real songs, not 5%: wholecheck_test.py);
@@ -323,11 +324,13 @@ def read_seconds(bundle, mode):
     return seconds
 
 
-def two_band_scores(data, src_sr, bundle, mode="windows"):
+def two_band_scores(data, src_sr, bundle, mode="windows", bank=False):
     """The numbers behind one two-band answer (shared by predict, demo.py and app.py): a dict with
     cal (where the cut-offs and real-song scores come from), p, s16 / e16, s44 / e44 (precise comb score and exact
     spacing per band), c16 / c44 (comb cut-offs), x (the fakeprint shown and used for "most like"), top (content
-    top in kHz), seconds (audio used) and how (e.g. "median of 8 windows")."""
+    top in kHz), seconds (audio used) and how (e.g. "median of 8 windows"). With `bank` (windows only, if the model
+    has a spacing bank): bank_p (the bank score as the share of real songs below, median over the windows) and
+    bank_i (the spacing that matched best)."""
     if use_whole(bundle, len(data), src_sr, mode):
         cal = bundle["whole"]
         seg = data[: int(cal["max_seconds"] * src_sr)]
@@ -345,7 +348,13 @@ def two_band_scores(data, src_sr, bundle, mode="windows"):
     # The exact spacing: from the window and band where the comb stands out most (score / that band's cut-off)
     best = max(range(n), key=lambda k: max(res[k][1][0] / c16, res[k][2][0] / c44))
     seconds = min(len(data), n * w) / src_sr
-    return dict(cal=bundle, p=float(np.median(ps)),
+    extra = {}
+    if bank and "bank" in bundle:
+        n0 = len(bundle["bands"][0]["freqs"])
+        shares, idx = fpm.bank_score(np.asarray(bundle["bands"][1]["freqs"], dtype=np.float64),
+                                     np.array([r[0][n0:] for r in res]), bundle["bank"])
+        extra = {"bank_p": float(np.median(shares)), "bank_i": int(idx[int(np.argmax(shares))])}
+    return dict(cal=bundle, p=float(np.median(ps)), **extra,
                 s16=float(np.median([r[1][0] for r in res])), e16=res[best][1][1],
                 s44=float(np.median([r[2][0] for r in res])), e44=res[best][2][1], c16=c16, c44=c44,
                 x=res[int(np.argsort(ps)[len(ps) // 2])][0],  # the median window
@@ -354,7 +363,7 @@ def two_band_scores(data, src_sr, bundle, mode="windows"):
                 f"first {seconds:.0f} s")
 
 
-def predict_two_band(f, bundle, data, src_sr, joint=False, mode="windows", base_rate=0.0):
+def predict_two_band(f, bundle, data, src_sr, joint=False, mode="windows", base_rate=0.0, bank=False):
     """Two fakeprints (1-8 kHz of 16 kHz audio, 5-16 kHz of 44.1 kHz audio) side by side (train_twoband.py).
     mode "windows" (default): the song is cut into 30 s windows (up to 8) and the median of each score counts
     (window_test.py; on 1,200 new songs, wholecheck_test.py: 3.3% of real songs flagged, 95.8% of AI caught).
@@ -362,9 +371,12 @@ def predict_two_band(f, bundle, data, src_sr, joint=False, mode="windows", base_
     whole song (up to 8 min) with its own cut-off. It catches more AI (99.7%), but flagged 7.0% of new real songs,
     not the 5% it was calibrated for, so it is not the default. mode "first": the first 30 s only.
     With `joint`, the verdict is classifier or precise comb, with one joint cut-off.
+    With `bank` (windows only): classifier or spacing bank, the comb checked only at the exact spacings of known
+    generators (known_spacing_test.py, bank_check.py: 83.4% vs 82.1% of fresh44's AI songs with 5.7% vs 6.6% of
+    never-used real songs flagged, but a speed change moves the spacing: 5% vs 60% of speed-changed AI songs caught).
     If the model has the real songs' scores (train_twoband.py), the answer is how the song ranks among real songs
     and a level (likely real / unsure / likely AI) instead of AI / real (rate_text)."""
-    r = two_band_scores(data, src_sr, bundle, mode)
+    r = two_band_scores(data, src_sr, bundle, mode, bank=bank)
     cal, p, x, top = r["cal"], r["p"], r["x"], r["top"]
     s16, e16, s44, e44, c16, c44 = (r[k] for k in ("s16", "e16", "s44", "e44", "c16", "c44"))
     how = f", {r['how']}"
@@ -386,13 +398,25 @@ def predict_two_band(f, bundle, data, src_sr, joint=False, mode="windows", base_
             by_comb = level != "likely real" and p <= np.quantile(cal["real_scores"]["clf"], LEVELS[0])
             verdict = f"joint={js:.3f} -> {level}{' (by comb)' if by_comb else ''}: {txt}"
             is_ai = level != "likely real"
+    if bank and "bank_p" in r:
+        bk = cal["bank"]
+        clf_p = float(np.searchsorted(cal["real_scores"]["clf"], p, side="right") / len(cal["real_scores"]["clf"]))
+        bs = max(clf_p, r["bank_p"])
+        level, txt = rate_text(bs, bk["clf_bank_real"], bk["clf_bank_ai"], base_rate)
+        by_bank = level != "likely real" and r["bank_p"] > clf_p
+        match = f" (by bank: comb at {bk['spacings'][r['bank_i']]:.3f} Hz, like {bk['names'][r['bank_i']]})" \
+            if by_bank else ""
+        verdict = f"bank={bs:.3f} -> {level}{match}: {txt}"
+        is_ai = level != "likely real"
+    elif bank:
+        verdict += "  (--bank: needs a model with a spacing bank and the window mode; not used)"
     if is_ai:
         verdict += most_like(bundle["model"], x)
     # train_twoband.py: real songs with nothing above 16 kHz were flagged 8-10% of the time, not 5%
     low = f"  (content only up to {top:g} kHz: more false alarms)" if top < 16 else ""
     win = how
     return (f"{Path(f).name} [{src_sr / 1000:g} kHz, both bands{win}]: precise={s16:.1f} / {s44:.1f}"
-            f"{comb_note(sharp, exact, cut)}  P(AI)={p:.2f}{' ' if joint else ' -> '}{verdict}{low}")
+            f"{comb_note(sharp, exact, cut)}  P(AI)={p:.2f}{' ' if joint or bank else ' -> '}{verdict}{low}")
 
 
 def predict_one_band(f, bundle, args):
@@ -436,6 +460,10 @@ def cmd_predict(args):
     only_two = args.model is not None and two is not None
     if args.joint and (two is None or "joint_cutoff" not in two):
         sys.exit("--joint needs model_twoband.joblib with a joint cut-off (run train_twoband.py)")
+    if args.bank and args.joint:
+        sys.exit("use --joint or --bank, not both")
+    if args.bank and (args.whole or two is None or "bank" not in two):
+        sys.exit("--bank needs model_twoband.joblib with a spacing bank (train_twoband.py) and the window mode")
     mode = "first" if args.first_30s else "whole" if args.whole else "windows"
     if two is not None:
         d = two["max_duration"]
@@ -473,7 +501,8 @@ def cmd_predict(args):
             if two is not None:
                 data, src_sr = read_start(f, read_seconds(two, mode))
                 if src_sr >= two["min_sr"]:
-                    print(predict_two_band(f, two, data, src_sr, args.joint, mode=mode, base_rate=args.base_rate))
+                    print(predict_two_band(f, two, data, src_sr, args.joint, mode=mode, base_rate=args.base_rate,
+                                           bank=args.bank))
                     continue
                 if only_two:
                     print(f"{Path(f).name}: {src_sr / 1000:g} kHz, but {two_path.name} needs "
@@ -514,6 +543,11 @@ def main():
                    help="44.1 kHz files: AI if the classifier or the precise comb stands out, with one joint cut-off "
                         "(still 5%% of real songs). Better for new generators with a comb (MiniMax 81%% -> 95%%), "
                         "worse for ones without (Udio 91%% -> 73%%)")
+    p.add_argument("--bank", action="store_true",
+                   help="44.1 kHz files: AI if the classifier or the spacing bank stands out (the comb checked only at "
+                        "the exact spacings of known generators). On new songs: 83.4%% of AI caught vs 82.1%% for "
+                        "--joint, with fewer false alarms (5.7%% vs 6.6%%), but it misses songs whose speed was "
+                        "changed (5%% vs 60%%) (bank_check.py)")
     p.add_argument("--first-30s", action="store_true",
                    help="44.1 kHz files: score only the first 30 s (the oldest way)")
     p.add_argument("--whole", action="store_true",
