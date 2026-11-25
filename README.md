@@ -17,11 +17,12 @@ copies part of the spectrum, which leaves **thin peaks at an exact, even spacing
 1. Average the song's spectrum (FFT size 16384, about 2.7 Hz per bin).
 2. Remove the overall shape and keep only the small peaks: the **fakeprint**. Two bands are used: 1–8 kHz (of
    16 kHz audio) and 5–16 kHz (of 44.1 kHz audio).
-3. A **logistic regression** scores the fakeprint. A training-free **precise comb** check also looks for peaks at
-   one exact spacing (that spacing is the generator's frame rate).
+3. Two checks score the fakeprint: a **logistic regression with one boundary per generator family** (17
+   generators), and a **spacing bank** that looks for peaks at the exact spacings (decoder frame rates) of 11 known
+   generators. Whichever stands out more decides.
 4. The score is **ranked among 9,378 real songs** the model never trained on: above 99% = likely AI, 90–99% =
    unsure, below 90% = likely real. A rank is easier to read than a raw probability, which depends on how common
-   AI songs are.
+   AI songs are. Songs are scored in 30-second parts (up to 4 minutes) and the middle score counts.
 
 ## Results
 
@@ -29,10 +30,11 @@ All numbers below were measured on songs the model never trained on.
 
 | Test | Result |
 |---|---|
-| 12 generators it was trained on (cross-validated) | **96%** of AI songs caught, with 5% of real songs flagged |
-| 1,200 new songs never used before (600 real from 3 sources, 600 Suno V5.5 / MiniMax) | **95.8%** of AI caught, **3.3%** of real songs flagged |
-| Generators it never saw | Mixed: Udio 98%, HeartMuLa 100%, but Sonauto 28%, Mureka 16%, Lyria Pro 3 15% |
-| A 1% speed change | Breaks the classifier; the comb check survives and measures the change |
+| 17 generators it was trained on (cross-validated) | **90%** of AI songs caught (classifier), with 5% of real songs flagged |
+| New songs: Suno V5.5 / MiniMax / Lyria 3 (MiniMax and Lyria 3 never trained on) | **100% / 96% / 4%** caught |
+| 1,454 real songs never used (fresh44, Jamendo, mixtapes, community uploads) | **5.1%** flagged |
+| A generator family left out of training, one at a time | **67%** caught on average: Stable Audio 94%, ElevenLabs 90%, Sonauto 55%, but Mureka 21%, Udio 6%, Lyria 4% |
+| A 1% speed change | Breaks it (about 5% caught); `--joint` (classifier or precise comb) still catches about 60% |
 
 **What I learned:**
 - The trace comes from the generator's architecture, not its training data: even untrained decoders with random
@@ -42,7 +44,9 @@ All numbers below were measured on songs the model never trained on.
 - Extra features (spectrum shape, stereo, changes over time) looked better on the main tests but raised false
   alarms on new real songs: the model was learning differences between datasets, not AI traces.
 - Checking the comb only at the exact spacings of known generators (a "spacing bank") catches more AI with
-  fewer false alarms than searching every spacing, but a speed change moves the spacing, so it is an option.
+  fewer false alarms than searching every spacing. With the per-family classifier it became the default
+  (new AI songs 79% → 83%, false alarms 5.7% → 5.1%). A speed change moves the spacing, though, and some
+  generators (Lyria, Mubert) leave no comb at all.
 - Scoring the whole song catches more AI (99.7%), but its cut-off didn't hold on new real songs (7% flagged instead
   of 5%). So the default is the median over 30-second parts.
 
@@ -63,9 +67,10 @@ Uploaded files are not stored. There is also a Google Colab version (`demo.ipynb
 
 ```
 python detect.py selftest                 # no data needed: checks the method on synthetic audio
-python detect.py predict song.mp3         # rank among real songs, comb spacing if there is one
+python detect.py predict song.mp3         # rank among real songs (classifier or spacing bank), comb spacing
 python detect.py predict song.mp3 --joint # classifier or comb (better for new generators with a comb)
-python detect.py predict song.mp3 --bank  # classifier or comb at known generators' spacings (not for sped-up songs)
+python detect.py predict song.mp3 --no-bank  # the classifier alone
+python detect.py predict song.mp3 --model model_twoband_v1.joblib  # the model before Nov 25, 2026
 python detect.py predict song.mp3 --whole # the whole song instead of 30 s parts (more AI caught, more false alarms)
 ```
 

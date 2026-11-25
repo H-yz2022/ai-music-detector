@@ -1173,7 +1173,57 @@ as it was, and the bank is a separate option, `predict --bank` (B), for songs th
 MiniMax is caught even though it is not in the bank: its 689.06 Hz spacing is exactly 4 x 172.27 Hz (ACE-Step /
 Stable Audio), so its peaks sit on that bank comb.
 
-## Status and next steps (Nov 24, 2026)
+## A new default: per-family classifier + spacing bank (family_bank_test.py)
+
+LR per family is the best classifier on generators it has seen, but weaker on brand-new ones (MiniMax); the spacing
+bank catches MiniMax (its 689 Hz spacing is 4 x a bank spacing). Four rules on the same songs (features_tm\: FMA
+small + Echoes + more44 + more_real, 16 AI families; the bank in every test built only from the AI songs trained on;
+"or" = the higher of the two shares of real songs below):
+
+| | LR one boundary (old default) | LR + bank | LR per family | **Per family + bank** |
+|---|---|---|---|---|
+| AI caught, cv (trained on) | 87.5% | 83.6% | **90.3%** | 85.0% |
+| AI caught, family never seen (logo) | 65.0% | **66.9%** | 64.7% | 66.6% |
+| fresh44 AI caught (Suno V5.5, MiniMax, Lyria 3) | 78.3% | 83.1% | 76.7% | **83.4%** |
+| MiniMax / Lyria 3 | 77.7 / **23.5%** | 96.4 / 3.9% | 73.2 / 17.6% | **96.4** / 5.9% |
+| Never-used real songs flagged (1,454) | 6.3% | 5.4% | **5.1%** | 5.2% |
+| Live concerts flagged | 6.9% | 3.6% | 5.3% | **3.1%** |
+| Speed-changed AI caught (mean of ±1, ±3%) | **13.1%** | 3.1% | 13.5% | 1.9% |
+| Never seen: Stable Audio / ElevenLabs / Sonauto | 47 / 68 / 37% | – | 47 / 68 / 26% | **94 / 90 / 55%** |
+| Never seen: Lyria / Udio | 32 / 16% | 7 / 4% | **41 / 18%** | 4 / 6% |
+
+(The first run of the leave-one-out part had two bugs in the bank column: an unsorted reference list, and bank shares
+ranked against the small cut-off set itself, which saturated at 1.0. Both were fixed and that part was rerun.)
+
+Rule fixed before running: per family + bank becomes the default if, against LR one boundary, it catches at least 2
+points more of fresh44's AI (+5.1), loses at most 2 points on never-seen families (+1.6), and flags at most 6% of
+never-used real songs and at most 0.5 points more (5.2%, −1.1). **Passed: it is the new default.**
+
+**The new `model_twoband.joblib`** (`train_twoband.py --extra-dir features_hq\more_real features_hq\more44 --family`;
+the old one is kept as `model_twoband_v1.joblib`): 17 generators in 16 families, 9,378 real songs; cut-off P(AI) >
+0.237, cross-validated AUC 0.974, 89.8% of AI caught by the classifier alone. Whole-song calibration redone
+(`calibrate_whole.py`). Checked on the never-used songs (`bank_check.py --model ...`), against the old default:
+
+| | Old default (v1, classifier) | **New default (per family + bank)** |
+|---|---|---|
+| fresh44 AI caught | 79.2% | **83.1%** |
+| Suno V5.5 / MiniMax / Lyria 3 | 100 / 86 / 4% | **100 / 96** / 4% |
+| Never-used real songs flagged (1,454) | 5.7% | **5.1%** |
+| Robustness songs, clean / MP3 / noise, AI caught | 94 / 85 / 72% | **97 / 96 / 83%** |
+| Speed-changed AI caught | **7.3%** | 5.6% |
+
+**What this means:**
+- **More AI caught with fewer false alarms**, mostly thanks to generators with a comb, including ones never trained
+  on (MiniMax, and in the leave-one-out test Stable Audio, ElevenLabs, Sonauto).
+- **Against the real old default, Lyria 3 does not get worse** (4% either way): the drop in the table above is
+  against a classifier that trained on Lyria Pro 3. Generators with no comb (Lyria, Mubert, a never-seen Udio) are
+  still the weak spot, and generators the model trained on lose a little (90% → 85% in cv), because "classifier or
+  bank" needs a stricter cut-off.
+- **Speed changes still break it.** `--joint` (classifier or precise comb) catches about 60% of them.
+- `predict`, the web demo and the Colab demo use the new default; `--no-bank` gives the classifier alone, and
+  `--model model_twoband_v1.joblib` the old model.
+
+## Status and next steps (Nov 25, 2026)
 
 - Bump removal (`remove_bumps()`, `comb_score(..., bump_hz=15)`) and the precise comb (`precise_comb()`) are in
   `fakeprint.py`. `detect.py predict` uses them and prints the exact spacing. The `selftest` and `train` reports and
@@ -1214,6 +1264,8 @@ Stable Audio), so its peaks sit on that bank comb.
      Known-spacing bank (`known_spacing_test.py`): classifier + bank catches 87.2% vs 84.6% (classifier + precise
      comb) with fewer false alarms (5.5% vs 6.4%). On new songs (`bank_check.py`) it breaks under speed changes, so
      it is an option, `predict --bank`, and `--joint` is unchanged.
+  10. Done: per-family classifier + spacing bank (`family_bank_test.py`) is the new default: new AI songs
+     79% → 83%, never-used real songs flagged 5.7% → 5.1%. Still weak: speed changes, Lyria, Mubert.
   6. fresh44 and the live concerts have now also been used to judge the new features, so a model chosen from
      these results needs a new, unused test set.
 
@@ -1361,7 +1413,7 @@ the model can learn "MP3 vs WAV" instead of "AI vs real".
 | `synth.py` | Synthetic "real" clips and a random transposed-conv decoder for "AI" clips |
 | `audio_io.py` | Loads WAV (and MP3/FLAC with soundfile) from a file or from memory, and resamples it |
 | `report.py` | Interactive HTML report (Plotly, works offline) |
-| `detect.py` | Command line: `selftest`, `train`, `predict` (two-band model for 44.1 kHz files, median over 30 s windows, ranked among real songs as likely real / unsure / likely AI; `--base-rate` adds a rough chance of AI; `model_family` for others; `--joint` adds the comb; `--bank` adds the spacing bank; `--whole` scores the whole song with its own cut-off) |
+| `detect.py` | Command line: `selftest`, `train`, `predict` (two-band model for 44.1 kHz files, median over 30 s windows, ranked among real songs as likely real / unsure / likely AI; `--base-rate` adds a rough chance of AI; `model_family` for others; `--joint` adds the comb; classifier or spacing bank by default (`--no-bank`: classifier alone); `--whole` scores the whole song with its own cut-off) |
 | `scan_sonics.py` | Training-free comb scan of SONICS songs, grouped by Suno/Udio, with HTML report |
 | `fetch_data.py` | Downloads SONICS or FMA (or the FMA artist table), keeps a small sample, deletes the zip |
 | `evaluate.py` | Held-out test: settings and classifier from `data\`, scored on `data_fresh\` |
@@ -1396,6 +1448,7 @@ the model can learn "MP3 vs WAV" instead of "AI vs real".
 | `fullband_probe.py` | Mureka / Lyria 3 / Suno / real songs: fakeprint and precise comb in four bands (0.5–20 kHz), 60 s each streamed → `reports/fullband_probe.json` |
 | `known_spacing_test.py` | Comb check at known spacings (a bank learned from half of each family's songs) vs the precise comb, alone and with the classifier → `reports/known_spacing_test.json` |
 | `bank_check.py` | The spacing bank of `model_twoband.joblib` on never-used songs (fresh44, new real songs, robustness changes): three joint rules → `reports/bank_check.json` |
+| `family_bank_test.py` | LR one boundary vs per family, each alone and with the spacing bank: cv, leave one family out, fresh44 / new real / robustness songs → `reports/family_bank_test.json` |
 | `robust_test.py` | Robustness: 220 songs changed 11 ways (speed, pitch, tempo, MP3/Ogg re-encode, EQ, noise), scored by every model → `reports\robust_test.json` (`--rescore` re-scores saved fakeprints) |
 | `more_real.py` | 1,500 more varied real songs (FMA large, Internet Archive netlabels and Live Music Archive), fakeprints only → `features_hq\more_real\` |
 | `more44_test.py` | 2,762 more AI songs (Udio, Mureka, HeartMuLa, Sonauto, Lyria Pro 3) read from tar, parquet and single files; before/after tests (`--family`: per-family classifier) |

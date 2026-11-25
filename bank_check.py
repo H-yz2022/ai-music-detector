@@ -15,6 +15,7 @@ four speed changes, at most 5 points fewer of the robustness AI songs than A. Ot
 
   python -I bank_check.py        # ~2 min; reports\bank_check.json
 """
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -49,7 +50,11 @@ def rules(b, fp0, fp1, s16, s44):
 
 
 def main():
-    b = joblib.load(HERE / "model_twoband.joblib")
+    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap.add_argument("--model", default=str(HERE / "model_twoband.joblib"))
+    ap.add_argument("--out", default=str(HERE / "reports" / "bank_check.json"))
+    args = ap.parse_args()
+    b = joblib.load(args.model)
     sets = {}
     f = np.load(HERE / "features_tm" / "fresh44.npz")
     hi = f["src_sr"] >= 44100
@@ -91,7 +96,7 @@ def main():
           and summary[k]["speed changes AI (mean)"] >= summary["A"]["speed changes AI (mean)"] - 0.05]
     pick = max(ok, key=lambda k: summary[k]["fresh44 AI"]) if ok else "A"
     print(f"\nRule: passes {ok or 'none'} -> --joint uses {pick}")
-    (HERE / "reports" / "bank_check.json").write_text(json.dumps({"sets": res, "summary": summary, "pick": pick},
+    Path(args.out).write_text(json.dumps({"sets": res, "summary": summary, "pick": pick},
                                                                  indent=1))
 
 

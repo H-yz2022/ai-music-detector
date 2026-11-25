@@ -23,6 +23,7 @@ __pycache__/
 *.joblib
 !model_twoband.joblib
 !model_family.joblib
+!model_twoband_v1.joblib
 
 # Local settings
 .claude/

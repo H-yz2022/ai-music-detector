@@ -23,7 +23,7 @@
  },
  "max_duration": 30.0,
  "min_sr": 44100,
- "cutoff": 0.09980437234044064,
+ "cutoff": 0.23744575679302066,
  "comb_cutoffs": {
   "__list__": [
    9.319069671206776,
@@ -42,7 +42,7 @@
    "__array__": "twoband/real_scores/s44"
   }
  },
- "joint_cutoff": 0.9815525698443165,
+ "joint_cutoff": 0.9817818298144594,
  "real_joint": {
   "__array__": "twoband/real_joint"
  },
@@ -65,12 +65,12 @@
     "brev / elevenlabs / suno",
     "diffrhythm",
     "heartmula",
-    "mureka",
+    "mureka / mureka_v9",
     "musicgen",
     "producer",
     "sonauto",
     "songgen",
-    "udio"
+    "udio / udio_new"
    ]
   },
   "real_scores": {
@@ -113,19 +113,56 @@
   "real_bank": {
    "__array__": "twoband/bank/real_bank"
   },
-  "clf_bank_cutoff": 0.9726114310087438,
+  "clf_bank_cutoff": 0.9741042866282789,
   "clf_bank_real": {
    "__array__": "twoband/bank/clf_bank_real"
   },
   "clf_bank_ai": {
    "__array__": "twoband/bank/clf_bank_ai"
   },
-  "clf_bank_comb_cutoff": 0.9853007037747921,
+  "clf_bank_comb_cutoff": 0.9856206014075496,
   "clf_bank_comb_real": {
    "__array__": "twoband/bank/clf_bank_comb_real"
   },
   "clf_bank_comb_ai": {
    "__array__": "twoband/bank/clf_bank_comb_ai"
+  }
+ },
+ "whole": {
+  "real_scores": {
+   "clf": {
+    "__array__": "twoband/whole/real_scores/clf"
+   },
+   "s16": {
+    "__array__": "twoband/whole/real_scores/s16"
+   },
+   "s44": {
+    "__array__": "twoband/whole/real_scores/s44"
+   }
+  },
+  "real_joint": {
+   "__array__": "twoband/whole/real_joint"
+  },
+  "cutoff": 0.5414892435073853,
+  "joint_cutoff": 0.9819026548672566,
+  "ai_scores": {
+   "clf": {
+    "__array__": "twoband/whole/ai_scores/clf"
+   },
+   "joint": {
+    "__array__": "twoband/whole/ai_scores/joint"
+   }
+  },
+  "min_seconds": 60.0,
+  "max_seconds": 480.0,
+  "calibrated_on": {
+   "community": 371,
+   "jamendo": 398,
+   "lyria3": 51,
+   "minimax3": 105,
+   "mixtapes": 282,
+   "real_jamendo": 79,
+   "suno_v5.5": 145
   }
  },
  "model": {
@@ -137,8 +174,23 @@
   },
   "classes": {
    "__list__": [
-    "False",
-    "True"
+    "acestep",
+    "audioldm",
+    "brev",
+    "diffrhythm",
+    "elevenlabs",
+    "heartmula",
+    "lyria",
+    "mubert",
+    "mureka",
+    "musicgen",
+    "producer",
+    "real",
+    "sonauto",
+    "songgen",
+    "stableaudio",
+    "suno",
+    "udio"
    ]
   }
  }

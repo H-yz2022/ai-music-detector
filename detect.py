@@ -2,11 +2,13 @@
 
   python detect.py selftest                          # no data needed
   python detect.py train --real data/real --ai data/ai
-  python detect.py predict song1.mp3 song2.wav       # 44.1 kHz files: model_twoband.joblib (both bands);
+  python detect.py predict song1.mp3 song2.wav       # 44.1 kHz files: model_twoband.joblib (both bands, one
+                                                     # boundary per generator family, or the spacing bank);
                                                      # lower rates: model_family.joblib (1-8 kHz)
   python detect.py predict song.mp3 --match-format   # low-rate files: first the same 16 kHz, 40 kbps MP3 as our tests
   python detect.py predict song.mp3 --joint          # 44.1 kHz files: classifier or comb (for new generators)
-  python detect.py predict song.mp3 --bank           # 44.1 kHz files: classifier or spacing bank (not after speed changes)
+  python detect.py predict song.mp3 --no-bank        # 44.1 kHz files: the classifier alone (better after speed changes)
+  python detect.py predict song.mp3 --model model_twoband_v1.joblib   # the model before Nov 25, 2026 (one boundary)
   python detect.py predict song.mp3 --base-rate 0.1  # also a rough chance of AI, if 10% of songs are AI
   44.1 kHz files: the median over 30 s windows (up to 8); --whole: one fakeprint of the whole song (up to 8 min,
   own cut-off; catches more AI but flagged 7% of new real songs, not 5%: wholecheck_test.py);
@@ -371,9 +373,11 @@ def predict_two_band(f, bundle, data, src_sr, joint=False, mode="windows", base_
     whole song (up to 8 min) with its own cut-off. It catches more AI (99.7%), but flagged 7.0% of new real songs,
     not the 5% it was calibrated for, so it is not the default. mode "first": the first 30 s only.
     With `joint`, the verdict is classifier or precise comb, with one joint cut-off.
-    With `bank` (windows only): classifier or spacing bank, the comb checked only at the exact spacings of known
-    generators (known_spacing_test.py, bank_check.py: 83.4% vs 82.1% of fresh44's AI songs with 5.7% vs 6.6% of
-    never-used real songs flagged, but a speed change moves the spacing: 5% vs 60% of speed-changed AI songs caught).
+    With `bank` (predict's default since Nov 25, 2026; windows only): classifier or spacing bank, the comb checked
+    only at the exact spacings of known generators (known_spacing_test.py, family_bank_test.py: with the per-family
+    model, 83.4% vs 78.3% of fresh44's AI songs and 5.2% vs 6.3% of never-used real songs flagged, compared with the
+    one-boundary classifier alone; but a speed change moves the spacing, and generators with no comb such as Lyria
+    are caught less often).
     If the model has the real songs' scores (train_twoband.py), the answer is how the song ranks among real songs
     and a level (likely real / unsure / likely AI) instead of AI / real (rate_text)."""
     r = two_band_scores(data, src_sr, bundle, mode, bank=bank)
@@ -408,8 +412,6 @@ def predict_two_band(f, bundle, data, src_sr, joint=False, mode="windows", base_
             if by_bank else ""
         verdict = f"bank={bs:.3f} -> {level}{match}: {txt}"
         is_ai = level != "likely real"
-    elif bank:
-        verdict += "  (--bank: needs a model with a spacing bank and the window mode; not used)"
     if is_ai:
         verdict += most_like(bundle["model"], x)
     # train_twoband.py: real songs with nothing above 16 kHz were flagged 8-10% of the time, not 5%
@@ -460,10 +462,8 @@ def cmd_predict(args):
     only_two = args.model is not None and two is not None
     if args.joint and (two is None or "joint_cutoff" not in two):
         sys.exit("--joint needs model_twoband.joblib with a joint cut-off (run train_twoband.py)")
-    if args.bank and args.joint:
-        sys.exit("use --joint or --bank, not both")
-    if args.bank and (args.whole or two is None or "bank" not in two):
-        sys.exit("--bank needs model_twoband.joblib with a spacing bank (train_twoband.py) and the window mode")
+    # Classifier or spacing bank: the default for 44.1 kHz files in the window mode, if the model has a bank
+    use_bank = (not args.no_bank and not args.joint and not args.whole and two is not None and "bank" in two)
     mode = "first" if args.first_30s else "whole" if args.whole else "windows"
     if two is not None:
         d = two["max_duration"]
@@ -478,6 +478,11 @@ def cmd_predict(args):
         print(f"(44.1 kHz files: {two_path.name}, both bands, classifier or precise comb with one joint cut-off: "
               f"AI if joint > {two['joint_cutoff']:.3f}, i.e. the song's highest score is above "
               f"{100 * two['joint_cutoff']:.1f}% of real training songs; {span})")
+    elif use_bank:
+        print(f"(44.1 kHz files: {two_path.name}, both bands; {span}. Classifier or spacing bank "
+              f"({len(two['bank']['spacings'])} known comb spacings; --no-bank for the classifier alone). Rank among "
+              f"real songs: above {100 * LEVELS[1]:g}% = likely AI, {100 * LEVELS[0]:g}-{100 * LEVELS[1]:g}% = unsure, "
+              f"below = likely real.)")
     elif two is not None and "ai_scores" in two:
         print(f"(44.1 kHz files: {two_path.name}, both bands; {span}. Rank among real songs: above "
               f"{100 * LEVELS[1]:g}% = likely AI, {100 * LEVELS[0]:g}-{100 * LEVELS[1]:g}% = unsure, below = likely "
@@ -502,7 +507,7 @@ def cmd_predict(args):
                 data, src_sr = read_start(f, read_seconds(two, mode))
                 if src_sr >= two["min_sr"]:
                     print(predict_two_band(f, two, data, src_sr, args.joint, mode=mode, base_rate=args.base_rate,
-                                           bank=args.bank))
+                                           bank=use_bank))
                     continue
                 if only_two:
                     print(f"{Path(f).name}: {src_sr / 1000:g} kHz, but {two_path.name} needs "
@@ -543,11 +548,10 @@ def main():
                    help="44.1 kHz files: AI if the classifier or the precise comb stands out, with one joint cut-off "
                         "(still 5%% of real songs). Better for new generators with a comb (MiniMax 81%% -> 95%%), "
                         "worse for ones without (Udio 91%% -> 73%%)")
-    p.add_argument("--bank", action="store_true",
-                   help="44.1 kHz files: AI if the classifier or the spacing bank stands out (the comb checked only at "
-                        "the exact spacings of known generators). On new songs: 83.4%% of AI caught vs 82.1%% for "
-                        "--joint, with fewer false alarms (5.7%% vs 6.6%%), but it misses songs whose speed was "
-                        "changed (5%% vs 60%%) (bank_check.py)")
+    p.add_argument("--no-bank", action="store_true",
+                   help="44.1 kHz files: the classifier alone, without the spacing bank (the default is classifier or "
+                        "bank: more AI caught with fewer false alarms on new songs, but songs whose speed was changed "
+                        "and generators with no comb, like Lyria, are caught less often; family_bank_test.py)")
     p.add_argument("--first-30s", action="store_true",
                    help="44.1 kHz files: score only the first 30 s (the oldest way)")
     p.add_argument("--whole", action="store_true",

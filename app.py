@@ -105,7 +105,11 @@ if spacing > 0:
 st.altair_chart(chart.properties(height=300),
                 alt=f"Fingerprint of the song from {name}" + (f", peaks repeating every {spacing:.1f} Hz" if spacing
                                                               else ", no repeating pattern"))
-if spacing > 0 and r["level"] == "likely real":
+if r.get("bank_spacing") and r["level"] != "likely real":
+    st.caption(f":red[Dashed lines]: the peaks line up with the exact spacing of known AI generators, every "
+               f"**{r['bank_spacing']:.2f} Hz** (like {r['bank_like'].replace(' / ', ', ').title()}). "
+               "This is what decided the answer.")
+elif spacing > 0 and r["level"] == "likely real":
     st.caption(f":red[Dashed lines]: an exact repeating pattern was found, every **{spacing:.1f} Hz** "
                f"({name} band). AI generators often leave one, but the overall check still points to people.")
 elif spacing > 0:
@@ -120,8 +124,9 @@ with st.expander("How does it work, and how reliable is it?", icon=":material/in
         """
 **The idea.** AI music generators build the sound step by step, making it longer at each step ("upsampling").
 These steps leave tiny, regular spikes in the average frequency spectrum, a kind of fingerprint. The tool removes
-the spectrum's overall shape, keeps only the spikes, and a simple statistical model (logistic regression) scores
-them. The method follows Afchar et al., *ISMIR 2025*.
+the spectrum's overall shape, keeps only the spikes, and two checks look at them: a simple statistical model
+(logistic regression, one boundary per family of generators) and a check for spikes at the exact spacings that
+known generators use. Whichever stands out more decides. The method follows Afchar et al., *ISMIR 2025*.
 
 **What the answer means.** The song is compared with human-made songs the model never trained on:
 - above 99% of them: **likely made by AI**
@@ -131,9 +136,10 @@ them. The method follows Afchar et al., *ISMIR 2025*.
 **How it reads the song.** It scores up to the first 4 minutes in 30-second parts and takes the middle score,
 so one odd part cannot decide the answer.
 
-**How well it works (in our tests).** On 1,200 songs it had never seen, it caught about 96% of new songs from
-Suno and MiniMax and wrongly flagged about 3% of human-made songs. Generators it never saw are harder: it catches
-only about two thirds of them. So a single result is a hint, not proof.
+**How well it works (in our tests).** On songs it was never trained on, it caught 100% of new Suno songs and 96%
+of MiniMax songs, and wrongly flagged about 5% of 1,454 human-made songs. Some generators leave almost no trace:
+Google's Lyria is caught only rarely. Generators it has never seen are caught about two thirds of the time. So a
+single result is a hint, not proof.
 
 **What can fool it.** Changing the speed of a song by about 1%, very low-quality files, or a brand-new generator.
 """

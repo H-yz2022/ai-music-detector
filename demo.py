@@ -113,11 +113,14 @@ def score(path, base_rate=0.0, joint=False, mode="windows"):
                                match_format=True)
         return detect.predict_one_band(path, one, args) + "  (16 kHz model: AI / real only)", None
     data, sr = detect.read_start(path, detect.read_seconds(two, mode))
-    line = detect.predict_two_band(path, two, data, sr, joint=joint, mode=mode, base_rate=base_rate)
-    r = detect.two_band_scores(data, sr, two, mode)  # the same numbers predict used
+    bank = not joint and mode != "whole" and "bank" in two  # classifier or spacing bank: predict's default
+    line = detect.predict_two_band(path, two, data, sr, joint=joint, mode=mode, base_rate=base_rate, bank=bank)
+    r = detect.two_band_scores(data, sr, two, mode, bank=bank)  # the same numbers predict used
     cal, x = r["cal"], r["x"]
-    ref, val = (cal["real_joint"], float(detect.joint_score(cal["real_scores"], r["p"], r["s16"], r["s44"]))) \
-        if joint else (cal["real_scores"]["clf"], r["p"])
+    if joint:
+        ref, val = cal["real_joint"], float(detect.joint_score(cal["real_scores"], r["p"], r["s16"], r["s44"]))
+    else:
+        ref, val = rank_ref(cal, r)
     rank = float(np.searchsorted(ref, val, side="right") / len(ref))
     n0 = len(two["bands"][0]["freqs"])
     bands = [(two["bands"][0]["freqs"], x[:n0], (r["s16"], r["e16"]), r["c16"]),
@@ -129,7 +132,8 @@ def analyze(path, two=None, one=None, mode="windows"):
     """Everything the web app (app.py) shows for one song, as plain values:
     level ("likely AI" / "unsure" / "likely real"), rank (share of real songs below; None for the 16 kHz model),
     p (the model's P(AI)), cutoff_p, seconds and how (e.g. "median of 8 windows of 30 s"), and bands: a list of
-    (name, freqs in Hz, fakeprint, comb spacing in Hz or 0 if no exact comb)."""
+    (name, freqs in Hz, fakeprint, comb spacing in Hz or 0 if no exact comb). If the spacing bank decided (the comb
+    sits at a known generator's spacing): bank_spacing (Hz) and bank_like (which generators)."""
     import soundfile as sf
     import detect
     import fakeprint as fpm
@@ -150,16 +154,36 @@ def analyze(path, two=None, one=None, mode="windows"):
                 "sample_rate": sr,
                 "bands": [("1–8 kHz", f, fp, spacing if sharp > detect.SHARPNESS_THRESHOLD else 0.0)]}
     data, sr = detect.read_start(path, detect.read_seconds(two, mode))
-    r = detect.two_band_scores(data, sr, two, mode)  # the same numbers detect.py predict uses
+    bank = mode != "whole" and "bank" in two  # classifier or spacing bank, as detect.py predict
+    r = detect.two_band_scores(data, sr, two, mode, bank=bank)  # the same numbers detect.py predict uses
     cal, p, x = r["cal"], r["p"], r["x"]
-    rank = float(np.searchsorted(cal["real_scores"]["clf"], p, side="right") / len(cal["real_scores"]["clf"]))
+    ref, val = rank_ref(cal, r)
+    rank = float(np.searchsorted(ref, val, side="right") / len(ref))
+    match = {}
+    if "bank_p" in r:  # the bank decided: the song's comb sits at a known generator's spacing
+        clf_rank = float(np.searchsorted(cal["real_scores"]["clf"], p, side="right") / len(cal["real_scores"]["clf"]))
+        if r["bank_p"] > clf_rank and rank > detect.LEVELS[0]:  # only when it made the song unsure or likely AI
+            match = {"bank_spacing": float(cal["bank"]["spacings"][r["bank_i"]]),
+                     "bank_like": str(cal["bank"]["names"][r["bank_i"]])}
     n0 = len(two["bands"][0]["freqs"])
     bands = [("5–16 kHz", two["bands"][1]["freqs"], x[n0:], r["e44"] if r["s44"] > r["c44"] else 0.0),
              ("1–8 kHz", two["bands"][0]["freqs"], x[:n0], r["e16"] if r["s16"] > r["c16"] else 0.0)]
+    if match and not bands[0][3]:  # show the known spacing that matched on the chart
+        bands[0] = bands[0][:3] + (match["bank_spacing"],)
     level = "likely AI" if rank > detect.LEVELS[1] else "unsure" if rank > detect.LEVELS[0] else "likely real"
     return {"model": "44.1 kHz", "level": level, "rank": rank, "p": p, "cutoff_p": cal["cutoff"],
             "seconds": r["seconds"], "how": r["how"], "sample_rate": sr,
-            "n_real": len(cal["real_scores"]["clf"]), "bands": bands}
+            "n_real": len(ref), "bands": bands, **match}
+
+
+def rank_ref(cal, r):
+    """(real songs' sorted scores, this song's score) for its rank: classifier or spacing bank when the bank was
+    used (the highest of the two shares of real songs below), else the classifier alone."""
+    clf = cal["real_scores"]["clf"]
+    if "bank_p" not in r:
+        return clf, r["p"]
+    clf_rank = float(np.searchsorted(clf, r["p"], side="right") / len(clf))
+    return cal["bank"]["clf_bank_real"], max(clf_rank, r["bank_p"])
 
 
 def figure(name, line, plot):
