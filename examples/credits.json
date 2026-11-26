@@ -1,0 +1,36 @@
+{
+ "human": {
+  "title": "Is It Right?",
+  "artist": "Lower Loveday",
+  "license": "CC BY-SA",
+  "link": "https://www.jamendo.com/track/1559614/is-it-right",
+  "source": "Jamendo (via jamendolyrics/jam-alt)",
+  "file": "human.mp3",
+  "seconds": 77,
+  "rank": 0.827,
+  "chosen_from": "11 of 13 candidate human songs got 'likely real' (2 'unsure'); this one is at the group's median rank",
+  "scored_seconds": 60
+ },
+ "suno": {
+  "title": "89c6b531-3d35-4051-998b-58d77bf2f677",
+  "license": "CC BY 4.0",
+  "link": "https://huggingface.co/datasets/Kukedlc/suno-ai-music-dataset",
+  "source": "Suno V5.5 (Hugging Face: Kukedlc/suno-ai-music-dataset)",
+  "file": "suno.mp3",
+  "seconds": 67,
+  "rank": 0.9987,
+  "chosen_from": "8 of 8 candidate Suno songs got 'likely AI'",
+  "scored_seconds": 60
+ },
+ "minimax": {
+  "title": "233907ae-c935-4674-be73-62f7556753ad",
+  "license": "CC BY 4.0",
+  "link": "https://huggingface.co/datasets/AngelSoftware/minimax-music-3-dataset",
+  "source": "MiniMax Music 3.0 (Hugging Face: AngelSoftware/minimax-music-3-dataset)",
+  "file": "minimax.mp3",
+  "seconds": 68,
+  "rank": 0.9984,
+  "chosen_from": "7 of 7 candidate MiniMax songs at 44.1 kHz got 'likely AI' (1 more was 24 kHz, left out)",
+  "scored_seconds": 60
+ }
+}

@@ -5,6 +5,7 @@
 Uses the same models and steps as `detect.py predict` (via demo.analyze; the models are stored as plain numbers in
 demo_models\\, so no pickles are needed when the app is hosted).
 """
+import json
 import tempfile
 from pathlib import Path
 
@@ -45,14 +46,31 @@ st.markdown(
 song = st.file_uploader("Upload a song", type=["mp3", "wav", "flac", "ogg"],
                         help="MP3, WAV, FLAC or OGG. Best: the original file, at least 1 minute long.")
 
-if song is None:
+# Example songs (make_examples.py): 60 s clips under licenses that allow sharing, credited below the player
+EXAMPLES = Path(__file__).parent / "examples"
+LABELS = {"human": "Song made by people", "suno": "AI song (Suno)", "minimax": "AI song (MiniMax, never trained on)"}
+credits = json.loads((EXAMPLES / "credits.json").read_text(encoding="utf-8")) if (EXAMPLES / "credits.json").exists() else {}
+pick = None
+if credits and song is None:
+    choice = st.pills("Or try an example", [LABELS[k] for k in LABELS if k in credits], key="example")
+    pick = next((k for k in credits if LABELS.get(k) == choice), None)
+
+if song is None and pick is None:
     st.info("Your file is only used for this check and is not stored.", icon=":material/lock:")
     st.stop()
 
-st.audio(song)
+if song is not None:
+    data, name = song.getvalue(), song.name
+else:
+    c = credits[pick]
+    data, name = (EXAMPLES / c["file"]).read_bytes(), c["file"]
+st.audio(data, format="audio/mpeg" if name.lower().endswith(".mp3") else None)
+if song is None:
+    who = f"“{c['title']}” by {c['artist']}" if pick == "human" else f"A {c['source'].split(' (')[0]} song"
+    st.caption(f"Example: {who}, a {c['seconds']} s clip. {c['license']}, from [{c['source']}]({c['link']}).")
 with st.spinner("Listening to the song ..."):
     try:
-        r = analyze(song.getvalue(), song.name)
+        r = analyze(data, name)
     except Exception as exc:  # unreadable or too short
         st.error(f"Sorry, this file could not be read ({exc}).", title="Could not check this song")
         st.stop()
@@ -106,9 +124,8 @@ st.altair_chart(chart.properties(height=300),
                 alt=f"Fingerprint of the song from {name}" + (f", peaks repeating every {spacing:.1f} Hz" if spacing
                                                               else ", no repeating pattern"))
 if r.get("bank_spacing") and r["level"] != "likely real":
-    st.caption(f":red[Dashed lines]: the peaks line up with the exact spacing of known AI generators, every "
-               f"**{r['bank_spacing']:.2f} Hz** (like {r['bank_like'].replace(' / ', ', ').title()}). "
-               "This is what decided the answer.")
+    st.caption(f":red[Dashed lines]: the peaks line up with **{r['bank_spacing']:.2f} Hz**, an exact spacing that "
+               "known AI generators use (or a whole-number part of one). This is what decided the answer.")
 elif spacing > 0 and r["level"] == "likely real":
     st.caption(f":red[Dashed lines]: an exact repeating pattern was found, every **{spacing:.1f} Hz** "
                f"({name} band). AI generators often leave one, but the overall check still points to people.")

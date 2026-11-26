@@ -61,7 +61,11 @@ streamlit run app.py
 
 Upload an MP3, WAV, FLAC or OGG file. The page says *Likely made by AI*, *Unsure* or *Likely made by people*, how the
 song ranks among real songs, and shows its fingerprint, with dashed lines where peaks repeat at an exact spacing.
-Uploaded files are not stored. There is also a Google Colab version (`demo.ipynb`, see the research log).
+Uploaded files are not stored. Three example songs can be tried without uploading anything (`examples/`, made by
+`make_examples.py`): "Is It Right?" by Lower Loveday (Jamendo, CC BY-SA), a Suno V5.5 song and a MiniMax Music 3.0
+song (both CC BY 4.0, from Hugging Face datasets). Each is the typical case of its group: 11 of 13 candidate human
+songs, 8 of 8 Suno songs and 7 of 7 MiniMax songs got the right answer. There is also a Google Colab version
+(`demo.ipynb`, see the research log).
 
 ## Command line
 
@@ -81,6 +85,7 @@ python detect.py predict song.mp3 --whole # the whole song instead of 30 s parts
 | `fakeprint.py` | The fakeprint, the comb score and the precise comb |
 | `detect.py` | Command line: `selftest`, `train`, `predict` |
 | `app.py` | Web demo (Streamlit) |
+| `examples/`, `make_examples.py` | Three short example songs for the web demo, with credits (`examples/credits.json`) |
 | `demo.py`, `demo.ipynb` | Colab demo; exports the models as plain numbers to `demo_models/` |
 | `train_twoband.py` | Trains the two-band model used by `predict` |
 | `*_test.py` | One script per experiment (see the research log); results in `reports/*.json` |
